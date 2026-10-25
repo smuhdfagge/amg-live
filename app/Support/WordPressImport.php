@@ -279,7 +279,7 @@ class WordPressImport
      */
     public function importItem(array $item, bool $update = false, bool $withPhotos = true): string
     {
-        $title = trim($item['title']) ?: 'Untitled';
+        $title = self::cleanTitle($item['title'] ?? '') ?: 'Untitled';
         $existing = Post::where('legacy_id', $item['id'] ?: -1)->first()
             ?? Post::where('slug', $item['slug'] ?: Str::slug($title))->first();
 
@@ -530,6 +530,25 @@ class WordPressImport
     /* ------------------------------------------------------------------
      | Helpers
      * ------------------------------------------------------------------ */
+
+    /**
+     * Plain-text title: no <strong>, <em> or other tags, whether they arrive
+     * as real tags or written out as &lt;strong&gt;, and entities like &amp;
+     * turned into the characters they stand for.
+     */
+    public static function cleanTitle(string $title): string
+    {
+        for ($i = 0; $i < 3; $i++) {
+            $decoded = html_entity_decode($title, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            // Only real tags such as <strong> or </em>, so "Children <5 years" survives.
+            $title = preg_replace('~<\s*/?\s*[a-z][a-z0-9-]*(\s[^<>]*)?/?\s*>~i', '', $decoded);
+            if ($title === $decoded && ! str_contains($title, '&')) {
+                break;
+            }
+        }
+
+        return trim(preg_replace('/\s+/u', ' ', str_replace("\u{00A0}", ' ', $title)));
+    }
 
     public static function category(array $names): string
     {

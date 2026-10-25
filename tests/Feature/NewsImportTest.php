@@ -319,4 +319,42 @@ class NewsImportTest extends TestCase
         Storage::disk('public')->assertExists($post->cover_image);
         $this->assertSame(1, $calls['v6'], 'After the first hang, everything goes over IPv4.');
     }
+
+    public function test_titles_come_in_without_strong_or_other_tags(): void
+    {
+        $cases = [
+            '<strong>Free genotype testing</strong> in Gwale' => 'Free genotype testing in Gwale',
+            '&lt;strong&gt;Mental health walk&lt;/strong&gt;' => 'Mental health walk',
+            '&amp;lt;strong&amp;gt;Double encoded&amp;lt;/strong&amp;gt;' => 'Double encoded',
+            '<STRONG>Caps</STRONG> &amp; <em>more</em>' => 'Caps & more',
+            '<strong >Spaced</ strong>&nbsp;title' => 'Spaced title',
+            'Children &lt;5 years get care' => 'Children <5 years get care',
+            'Plain title' => 'Plain title',
+        ];
+        foreach ($cases as $in => $out) {
+            $this->assertSame($out, WordPressImport::cleanTitle($in), $in);
+        }
+
+        // Both import routes use it.
+        Storage::fake('public');
+        $importer = app(WordPressImport::class);
+        $importer->importItem(['id' => 7, 'slug' => 'a', 'title' => '<strong>From the file</strong>', 'html' => '<p>x</p>', 'excerpt' => '', 'image' => null, 'categories' => [], 'link' => '', 'date' => '2024-01-01'], false, false);
+        $this->assertSame('From the file', Post::firstWhere('legacy_id', 7)->title);
+
+        $this->fakeSite([[$this->restPost(8, 'b', '&lt;strong&gt;From the site&lt;/strong&gt;')]]);
+        $item = $importer->fetchPage('https://aminumagashigarbafoundation.org', 1)['items'][0];
+        $importer->importItem($item, false, false);
+        $this->assertSame('From the site', Post::firstWhere('legacy_id', 8)->title);
+    }
+
+    public function test_titles_imported_earlier_are_cleaned_by_the_update(): void
+    {
+        Post::create(['slug' => 'old', 'title' => '<strong>Old import</strong>', 'category' => 'News', 'body' => 'x', 'published_at' => now()]);
+        Post::create(['slug' => 'typed', 'title' => 'Under-5s <3 our nurses', 'category' => 'News', 'body' => 'x', 'published_at' => now()]);
+
+        (require database_path('migrations/2026_10_25_160000_clean_imported_news_titles.php'))->up();
+
+        $this->assertSame('Old import', Post::firstWhere('slug', 'old')->title);
+        $this->assertSame('Under-5s <3 our nurses', Post::firstWhere('slug', 'typed')->title);
+    }
 }
