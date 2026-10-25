@@ -53,6 +53,10 @@ Route::post('/admin/logout', [LoginController::class, 'logout'])->middleware('au
 
 Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('/', Admin\DashboardController::class)->name('dashboard');
+    Route::get('news-import', [Admin\NewsImportController::class, 'show'])->name('news-import.show');
+    Route::post('news-import', [Admin\NewsImportController::class, 'start'])->name('news-import.start');
+    Route::post('news-import/step', [Admin\NewsImportController::class, 'step'])->name('news-import.step');
+    Route::post('news-import/reset', [Admin\NewsImportController::class, 'reset'])->name('news-import.reset');
     Route::resource('posts', Admin\PostController::class)->except('show');
     Route::resource('projects', Admin\ProjectController::class)->except('show');
     Route::resource('resources', Admin\ResourceController::class)->except('show');

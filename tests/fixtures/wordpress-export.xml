@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0"
+	xmlns:excerpt="http://wordpress.org/export/1.2/excerpt/"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:wp="http://wordpress.org/export/1.2/">
+<channel>
+	<title>Aminu Magashi Garba Foundation</title>
+	<wp:wxr_version>1.2</wp:wxr_version>
+	<item>
+		<title><![CDATA[Free genotype testing in Gwale]]></title>
+		<link>https://old.example.org/2024/03/free-genotype-testing-in-gwale/</link>
+		<content:encoded><![CDATA[<!-- wp:paragraph --><p>The Foundation held a <strong>free genotype</strong> testing day.</p><!-- /wp:paragraph -->
+<h3>What happened</h3>
+<ul><li>420 people tested</li><li>Counselling for couples</li></ul>
+<figure class="wp-block-image"><img src="https://old.example.org/wp-content/uploads/2024/03/day-1024x683.jpg" srcset="https://old.example.org/wp-content/uploads/2024/03/day-300x200.jpg 300w, https://old.example.org/wp-content/uploads/2024/03/day-1024x683.jpg 1024w" /><figcaption>Testing day</figcaption></figure>
+[gallery ids="1,2"]
+<p>Thanks to our partners &amp; volunteers.</p>]]></content:encoded>
+		<excerpt:encoded><![CDATA[]]></excerpt:encoded>
+		<wp:post_id>101</wp:post_id>
+		<wp:post_date><![CDATA[2024-03-10 10:00:00]]></wp:post_date>
+		<wp:post_date_gmt><![CDATA[2024-03-10 09:00:00]]></wp:post_date_gmt>
+		<wp:post_name><![CDATA[free-genotype-testing-in-gwale]]></wp:post_name>
+		<wp:status><![CDATA[publish]]></wp:status>
+		<wp:post_type><![CDATA[post]]></wp:post_type>
+		<category domain="category" nicename="events"><![CDATA[Events]]></category>
+		<wp:postmeta><wp:meta_key><![CDATA[_thumbnail_id]]></wp:meta_key><wp:meta_value><![CDATA[201]]></wp:meta_value></wp:postmeta>
+	</item>
+	<item>
+		<title><![CDATA[A draft that should stay behind]]></title>
+		<link>https://old.example.org/?p=102</link>
+		<content:encoded><![CDATA[<p>Draft</p>]]></content:encoded>
+		<wp:post_id>102</wp:post_id>
+		<wp:post_date><![CDATA[2024-04-01 10:00:00]]></wp:post_date>
+		<wp:post_name><![CDATA[draft]]></wp:post_name>
+		<wp:status><![CDATA[draft]]></wp:status>
+		<wp:post_type><![CDATA[post]]></wp:post_type>
+	</item>
+	<item>
+		<title><![CDATA[About us page]]></title>
+		<wp:post_id>103</wp:post_id>
+		<wp:status><![CDATA[publish]]></wp:status>
+		<wp:post_type><![CDATA[page]]></wp:post_type>
+	</item>
+	<item>
+		<title><![CDATA[Foundation in the Daily Trust]]></title>
+		<link>https://old.example.org/foundation-in-the-daily-trust/</link>
+		<content:encoded><![CDATA[<p>Our work on mental health was featured.</p>]]></content:encoded>
+		<excerpt:encoded><![CDATA[A national paper covered our mental health work.]]></excerpt:encoded>
+		<wp:post_id>104</wp:post_id>
+		<wp:post_date><![CDATA[2023-11-02 08:30:00]]></wp:post_date>
+		<wp:post_date_gmt><![CDATA[0000-00-00 00:00:00]]></wp:post_date_gmt>
+		<wp:post_name><![CDATA[foundation-in-the-daily-trust]]></wp:post_name>
+		<wp:status><![CDATA[publish]]></wp:status>
+		<wp:post_type><![CDATA[post]]></wp:post_type>
+		<category domain="category" nicename="press"><![CDATA[Press]]></category>
+	</item>
+	<item>
+		<title><![CDATA[day]]></title>
+		<wp:post_id>201</wp:post_id>
+		<wp:post_type><![CDATA[attachment]]></wp:post_type>
+		<wp:attachment_url><![CDATA[https://old.example.org/wp-content/uploads/2024/03/cover.jpg]]></wp:attachment_url>
+	</item>
+</channel>
+</rss>

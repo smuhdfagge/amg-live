@@ -64,3 +64,25 @@
   }
   type.addEventListener('change', sync);
 })();
+// Admin news import: show the right fields, and keep the batches going.
+(function () {
+  var form = document.querySelector('[data-import-form]');
+  if (form) {
+    var sync = function () {
+      var picked = form.querySelector('input[name="source"]:checked');
+      form.querySelectorAll('[data-show-for]').forEach(function (el) {
+        var on = picked && el.getAttribute('data-show-for') === picked.value;
+        el.hidden = !on;
+        el.querySelectorAll('input').forEach(function (i) { i.disabled = !on; });
+      });
+    };
+    form.querySelectorAll('input[name="source"]').forEach(function (r) { r.addEventListener('change', sync); });
+    sync();
+    form.addEventListener('submit', function () {
+      var b = form.querySelector('button[type="submit"]');
+      if (b) { b.disabled = true; b.textContent = 'Checking the old website…'; }
+    });
+  }
+  var next = document.querySelector('[data-import-running] [data-import-next]');
+  if (next) setTimeout(function () { next.submit(); }, 400);
+})();

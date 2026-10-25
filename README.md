@@ -114,6 +114,19 @@ If your host runs the build for you, set its PHP version to 8.3 or 8.4 and use:
 
 If you ever see that error, check which PHP Composer is really using with `php -v` (on cPanel the command-line PHP is often older than the website's PHP). The deploy script finds the right one for you.
 
+## Importing news from the old website
+
+In the admin, go to **News** and select **Import from old website**. Either enter the old site's address, or upload the export file from WordPress (**Tools → Export → Posts**). The import brings across titles, dates, text, categories, the featured image and the photos inside each story, ten stories at a time. Stories already imported are skipped, so it is safe to run again.
+
+Run it while the old site is still online, because the photos are copied from it. Once the new site is live on the old address, old story links redirect to the new pages.
+
+For a very large import you can use the command line instead:
+
+```bash
+php artisan news:import https://aminumagashigarbafoundation.org
+php artisan news:import --file=/path/to/export.xml
+```
+
 ## Radio programmes, jingles and videos
 
 Add them under **Resources** in the admin. Each one is either an uploaded file or a link:

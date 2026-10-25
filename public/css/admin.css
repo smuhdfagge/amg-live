@@ -64,3 +64,16 @@ table.data a { font-weight: 600; color: var(--green); }
 .admin .filter-tabs { margin-bottom: 1.25rem; }
 [data-resource-form] .panel > .field + .field, [data-resource-form] .current-media + .field { margin-top: 1.1rem; }
 [data-resource-form] .panel > .field { margin-bottom: 1rem; }
+.import-progress .bar { height: 12px; background: var(--mist); border-radius: 999px; overflow: hidden; margin: 1.25rem 0; }
+.import-progress .bar span { display: block; height: 100%; background: var(--brand-green); transition: width .4s ease; }
+.import-counts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; margin: 0 0 1.5rem; }
+.import-counts div { background: var(--mist); border-radius: var(--radius); padding: .8rem 1rem; }
+.import-counts dt { font-size: .85rem; color: var(--muted); }
+.import-counts dd { margin: 0; font-family: var(--display); font-weight: 800; font-size: 1.6rem; color: var(--green-deep); }
+@media (max-width: 640px) { .import-counts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.choice { border: 0; padding: 0; margin: 0 0 1.25rem; display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+.choice legend { font-weight: 600; margin-bottom: .6rem; padding: 0; }
+.choice-card { display: flex; gap: .75rem; align-items: flex-start; border: 1px solid var(--line); border-radius: var(--radius); padding: 1rem; cursor: pointer; background: #fff; }
+.choice-card:has(input:checked) { border-color: var(--green); box-shadow: 0 0 0 2px var(--green) inset; }
+.choice-card input { margin-top: .3rem; }
+@media (max-width: 640px) { .choice { grid-template-columns: 1fr; } }

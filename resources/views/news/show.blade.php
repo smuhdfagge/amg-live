@@ -17,6 +17,14 @@
             <div class="prose">
                 @if ($post->excerpt)<p class="lead" style="color:var(--ink)">{{ $post->excerpt }}</p>@endif
                 @include('partials.blocks', ['blocks' => $post->bodyBlocks()])
+                @if ($post->gallery)
+                    <h2>Photos</h2>
+                    <div class="gallery">
+                        @foreach ($post->galleryUrls() as $i => $src)
+                            <a href="{{ $src }}" target="_blank" rel="noopener"><img src="{{ $src }}" alt="Photo {{ $i + 1 }} from {{ $post->title }}" loading="lazy"></a>
+                        @endforeach
+                    </div>
+                @endif
                 @if ($post->external_url)
                     <p><a class="text-link" href="{{ $post->external_url }}" target="_blank" rel="noopener">Read the original{{ $post->source ? ' on '.$post->source : '' }} <x-icon name="external" :size="16" /></a></p>
                 @endif

@@ -5,6 +5,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Exceptions\PostTooLargeException;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -28,6 +29,22 @@ return Application::configure(basePath: dirname(__DIR__))
             $back = preg_replace('/([?&])too_large=1(&|$)/', '$1', $back);
 
             return redirect()->to(rtrim($back, '?&').(str_contains($back, '?') ? '&' : '?').'too_large=1');
+        });
+
+        // Links to stories on the old WordPress site (for example /2023/05/my-story/)
+        // open the same story here once the news has been imported.
+        $exceptions->render(function (NotFoundHttpException $e, Request $request) {
+            if (! $request->isMethod('GET') || $request->is('admin/*', 'storage/*')) {
+                return null;
+            }
+            $path = rawurldecode(trim($request->path(), '/'));
+            try {
+                $post = \App\Models\Post::published()->where('legacy_path', $path)->first();
+            } catch (\Throwable) {
+                return null;   // database not ready
+            }
+
+            return $post ? redirect()->route('news.show', $post, 301) : null;
         });
 
         $exceptions->shouldRenderJsonWhen(

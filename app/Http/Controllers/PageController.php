@@ -10,8 +10,16 @@ use Illuminate\View\View;
 
 class PageController extends Controller
 {
-    public function home(): View
+    public function home(\Illuminate\Http\Request $request): View|\Illuminate\Http\RedirectResponse
     {
+        // Old WordPress short links look like /?p=123
+        if (ctype_digit((string) $request->query('p'))) {
+            $post = Post::published()->where('legacy_id', (int) $request->query('p'))->first();
+            if ($post) {
+                return redirect()->route('news.show', $post, 301);
+            }
+        }
+
         return view('pages.home', [
             'featured' => Project::where('is_featured', true)->ordered()->take(3)->get(),
             'posts' => Post::published()->take(3)->get(),

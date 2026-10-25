@@ -1,7 +1,7 @@
 @extends('admin.layout', ['title' => 'News'])
 
 @section('content')
-<div class="admin-top"><h1>News</h1><a class="btn btn-red btn-sm" href="{{ route('admin.posts.create') }}"><x-icon name="plus" :size="18" /> Add news</a></div>
+<div class="admin-top"><h1>News</h1><div class="btn-row"><a class="btn btn-outline btn-sm" href="{{ route('admin.news-import.show') }}"><x-icon name="download" :size="18" /> Import from old website</a><a class="btn btn-red btn-sm" href="{{ route('admin.posts.create') }}"><x-icon name="plus" :size="18" /> Add news</a></div></div>
 <div class="panel table-wrap">
     @if ($posts->isEmpty())
         <p class="muted mb-0">No news yet. Select Add news to publish your first story.</p>
