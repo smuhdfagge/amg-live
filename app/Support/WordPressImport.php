@@ -34,6 +34,13 @@ class WordPressImport
     /** Image extensions taken out of an uploads zip. */
     private const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
 
+    /**
+     * Connect over IPv4 only. Turned on by itself when a connection hangs:
+     * some connections (Starlink, for example) prefer IPv6, and a site that
+     * advertises IPv6 without answering on it then times out.
+     */
+    public bool $forceIpv4 = false;
+
     /** Hosts we could not connect to; photos from them are not tried again. */
     public array $deadHosts = [];
 
@@ -77,7 +84,7 @@ class WordPressImport
         foreach ($attempts as $i => $endpoint) {
             $params = $i === 0 ? $query : ['rest_route' => '/wp/v2/posts'] + $query;
             try {
-                $response = $this->http()->get($endpoint, $params);
+                $response = $this->getWithIpv4Fallback($endpoint, $params);
             } catch (ConnectionException $e) {
                 $connectionFailed = true;
 
@@ -141,7 +148,7 @@ class WordPressImport
         $host = parse_url($siteUrl, PHP_URL_HOST);
 
         if ($canGetOut) {
-            return 'This server can reach the internet, but could not connect to '.$host.'. '
+            return 'This server can reach the internet, but could not connect to '.$host.' (even over IPv4). '
                 .'The old website\'s host (or a firewall or security plugin on it) is blocking this server'
                 .($ip && filter_var($ip, FILTER_VALIDATE_IP) ? ', whose address is '.$ip.'. Ask the old host to allow that address, then try again' : '. Ask the old host to allow connections from your new server, then try again')
                 .'. Or use the export file option with a zip of the old photos, which needs no connection.';
@@ -368,7 +375,7 @@ class WordPressImport
 
         foreach ($candidates as $candidate) {
             try {
-                $response = $this->http()->get($candidate);
+                $response = $this->getWithIpv4Fallback($candidate);
             } catch (ConnectionException $e) {
                 $this->deadHosts[] = $host;   // do not wait on this host again
                 Log::info('News import: cannot connect to '.$host.' for photos');
@@ -492,12 +499,32 @@ class WordPressImport
         return $name.'.'.$ext;
     }
 
+    /** GET, and if the connection fails, try once more over IPv4 only. */
+    private function getWithIpv4Fallback(string $url, array $query = [])
+    {
+        try {
+            return $this->http()->get($url, $query);
+        } catch (ConnectionException $e) {
+            if ($this->forceIpv4) {
+                throw $e;
+            }
+            $this->forceIpv4 = true;
+            try {
+                return $this->http()->get($url, $query);
+            } catch (ConnectionException $again) {
+                $this->forceIpv4 = false;   // IPv4 did not help either
+                throw $again;
+            }
+        }
+    }
+
     private function http()
     {
         // Retry slow or failed answers, but not a host we cannot connect to at all.
         return Http::timeout(30)->connectTimeout(10)
             ->retry(2, 500, fn ($e) => ! $e instanceof ConnectionException, throw: false)
-            ->withHeaders(['User-Agent' => 'AMG-Foundation-website-importer/1.0', 'Accept' => 'application/json, */*']);
+            ->withHeaders(['User-Agent' => 'AMG-Foundation-website-importer/1.0', 'Accept' => 'application/json, */*'])
+            ->withOptions($this->forceIpv4 ? ['force_ip_resolve' => 'v4'] : []);
     }
 
     /* ------------------------------------------------------------------

@@ -226,7 +226,7 @@ class NewsImportTest extends TestCase
 
         $this->actingAs($this->admin())->from('/admin/news-import')
             ->post('/admin/news-import', ['source' => 'site', 'site_url' => 'http://aminumagashigarbafoundation.org'])
-            ->assertSessionHasErrors(['site_url' => 'This server can reach the internet, but could not connect to aminumagashigarbafoundation.org. '
+            ->assertSessionHasErrors(['site_url' => 'This server can reach the internet, but could not connect to aminumagashigarbafoundation.org (even over IPv4). '
                 ."The old website's host (or a firewall or security plugin on it) is blocking this server, whose address is 203.0.113.7. "
                 .'Ask the old host to allow that address, then try again. Or use the export file option with a zip of the old photos, which needs no connection.']);
     }
@@ -288,7 +288,35 @@ class NewsImportTest extends TestCase
         $this->actingAs($admin)->post('/admin/news-import/step');
 
         $this->assertSame(2, Post::count());
-        $this->assertSame(1, $this->oldSiteAttempts, 'Gives up on the old host after the first failed connection.');
+        $this->assertSame(2, $this->oldSiteAttempts, 'One try plus one over IPv4, then it gives up on the old host.');
         $this->actingAs($admin)->get('/admin/news-import')->assertSee('Photos could not be copied from old.example.org');
+    }
+
+    public function test_falls_back_to_ipv4_when_the_connection_hangs(): void
+    {
+        Storage::fake('public');
+        $calls = ['v6' => 0, 'v4' => 0];
+        Http::fake(function (HttpRequest $request, array $options) use (&$calls) {
+            if (($options['force_ip_resolve'] ?? null) !== 'v4') {
+                $calls['v6']++;
+                throw new ConnectionException('cURL error 28: Connection timed out');
+            }
+            $calls['v4']++;
+            if (str_contains($request->url(), '/wp-content/uploads/')) {
+                return Http::response($this->jpeg(), 200);
+            }
+
+            return Http::response([$this->restPost(1, 'only-story', 'Only story')], 200, ['X-WP-Total' => 1, 'X-WP-TotalPages' => 1]);
+        });
+        $admin = $this->admin();
+
+        $this->actingAs($admin)->post('/admin/news-import', ['source' => 'site', 'site_url' => 'aminumagashigarbafoundation.org', 'photos' => '1'])
+            ->assertRedirect(route('admin.news-import.show'));
+        $this->actingAs($admin)->post('/admin/news-import/step');
+
+        $post = Post::firstWhere('slug', 'only-story');
+        $this->assertNotNull($post);
+        Storage::disk('public')->assertExists($post->cover_image);
+        $this->assertSame(1, $calls['v6'], 'After the first hang, everything goes over IPv4.');
     }
 }

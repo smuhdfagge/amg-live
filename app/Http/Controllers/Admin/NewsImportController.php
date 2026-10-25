@@ -57,6 +57,7 @@ class NewsImportController extends Controller
             if ($data['source'] === 'site') {
                 $job['site_url'] = WordPressImport::normaliseSiteUrl($data['site_url']);
                 $first = $importer->fetchPage($job['site_url'], 1, self::BATCH);
+                $job['ipv4'] = $importer->forceIpv4;
                 $job['total'] = $first['total'] ?: count($first['items']);
                 $job['pages'] = $first['pages'];
             } else {
@@ -98,6 +99,7 @@ class NewsImportController extends Controller
 
         @set_time_limit(300);
         $importer->deadHosts = $job['dead_hosts'] ?? [];
+        $importer->forceIpv4 = $job['ipv4'] ?? false;
         if (! empty($job['uploads_dir'])) {
             $importer->localUploads = Storage::disk('local')->path($job['uploads_dir']);
         }
@@ -135,6 +137,7 @@ class NewsImportController extends Controller
         }
 
         $job['dead_hosts'] = array_values(array_unique($importer->deadHosts));
+        $job['ipv4'] = $importer->forceIpv4;
 
         if ($finished) {
             $job['done'] = true;
