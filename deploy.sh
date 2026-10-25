@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# SWATCH website deployment script
+# AMG Foundation website deployment script
 #
 # Run it from the project folder on the server:
 #
@@ -209,7 +209,7 @@ if [ ! -f .env ]; then
     cat <<EOF
 
 Open $APP_DIR/.env and fill in:
-  - APP_URL            (https://swatch.org.ng)
+  - APP_URL            (https://aminumagashigarbafoundation.org)
   - DB_CONNECTION, DB_HOST, DB_PORT, DB_DATABASE, DB_USERNAME, DB_PASSWORD
   - MAIL_MAILER=smtp and your mail server details (for form alerts)
   - ADMIN_EMAIL and a strong ADMIN_PASSWORD
@@ -255,7 +255,7 @@ if [ "$FORCE_SEED" = 1 ]; then
     warn "--seed given: running the full seeder. The admin password will be reset to ADMIN_PASSWORD."
     artisan db:seed --force
 else
-    artisan swatch:seed-if-empty
+    artisan amg:seed-if-empty
 fi
 
 # ---------------------------------------------------------------------------

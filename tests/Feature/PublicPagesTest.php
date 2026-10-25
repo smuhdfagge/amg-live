@@ -17,22 +17,32 @@ class PublicPagesTest extends TestCase
     {
         parent::setUp();
         $this->seed(DatabaseSeeder::class);
+
+        Project::create([
+            'slug' => 'sickle-cell-support', 'title' => 'Sickle cell support programme', 'partner' => 'Kano State Ministry of Health',
+            'period' => '2026', 'start_year' => 2026, 'status' => 'ongoing', 'theme' => 'Sickle cell and blood disorders',
+            'summary' => 'Helping patients reach care.', 'reach_figure' => '1,250', 'reach_label' => 'patients supported',
+        ]);
+        Post::create([
+            'slug' => 'press-coverage', 'title' => 'Foundation featured in the press', 'category' => 'In the press',
+            'external_url' => 'https://example.com/story', 'source' => 'Example News', 'published_at' => now()->subDay(),
+        ]);
     }
 
     public static function pages(): array
     {
         return [
-            'home' => ['/', 'Support for Women and Teenage Children</h1>'],
-            'about' => ['/about', 'How we started'],
-            'work' => ['/our-work', 'Thematic areas'],
-            'area' => ['/our-work/health', 'Related programmes'],
-            'programmes' => ['/programmes', 'Programme record'],
-            'programme' => ['/programmes/lopin-3', '12,083'],
-            'partners' => ['/partners', 'Chemonics International'],
-            'news' => ['/news', 'advanced HIV disease'],
-            'involved' => ['/get-involved', 'Volunteer with SWATCH'],
+            'home' => ['/', 'Better lives for vulnerable people and communities</h1>'],
+            'about' => ['/about', 'Our objectives'],
+            'work' => ['/our-work', 'Focus areas'],
+            'area' => ['/our-work/sickle-cell-and-blood-disorders', 'Related programmes'],
+            'programmes' => ['/programmes', 'Our programmes'],
+            'programme' => ['/programmes/sickle-cell-support', '1,250'],
+            'partners' => ['/partners', 'Kano State Ministry of Health'],
+            'news' => ['/news', 'Foundation featured in the press'],
+            'involved' => ['/get-involved', 'Volunteer with the Foundation'],
             'support' => ['/support-us', 'Ways to support'],
-            'contact' => ['/contact', 'Plot 203, New Court Road'],
+            'contact' => ['/contact', 'No. 9 Kura Road, off Lamido Crescent'],
             'privacy' => ['/privacy', 'Nigeria Data Protection Act'],
         ];
     }
@@ -83,6 +93,17 @@ class PublicPagesTest extends TestCase
             ->assertOk()
             ->assertSee('<h2>What they learned</h2>', false)
             ->assertSee('<li>Safeguarding</li>', false);
+    }
+
+    public function test_pages_work_before_any_content_is_added(): void
+    {
+        Project::query()->delete();
+        Post::query()->delete();
+
+        foreach (['/', '/about', '/programmes', '/partners', '/news', '/support-us'] as $url) {
+            $this->get($url)->assertOk();
+        }
+        $this->get('/programmes')->assertSee('Programmes are on the way');
     }
 
     public function test_sitemap_lists_programmes(): void

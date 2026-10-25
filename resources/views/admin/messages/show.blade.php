@@ -13,7 +13,7 @@
     </dl>
     <div class="message-body">{{ $message->message }}</div>
     <div class="form-actions">
-        <a class="btn btn-indigo" href="mailto:{{ $message->email }}?subject={{ rawurlencode('Re: '.($message->subject ?: 'Your message to SWATCH')) }}"><x-icon name="mail" :size="18" /> Reply by email</a>
+        <a class="btn btn-primary" href="mailto:{{ $message->email }}?subject={{ rawurlencode('Re: '.($message->subject ?: 'Your message to the AMG Foundation')) }}"><x-icon name="mail" :size="18" /> Reply by email</a>
         <form method="POST" action="{{ route('admin.messages.destroy', $message) }}" data-confirm="Delete this message?">@csrf @method('DELETE')<button class="btn btn-outline" type="submit">Delete</button></form>
     </div>
 </div>

@@ -17,21 +17,21 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
-    <title>{{ $title ?? 'Admin' }} | SWATCH admin</title>
+    <title>{{ $title ?? 'Admin' }} | AMG Foundation admin</title>
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     <link rel="stylesheet" href="{{ asset('css/site.css') }}?v={{ filemtime(public_path('css/site.css')) }}">
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}?v={{ filemtime(public_path('css/admin.css')) }}">
 </head>
 <body class="admin">
 <div class="admin-mobile-bar">
-    <strong>SWATCH admin</strong>
+    <strong>AMG Foundation admin</strong>
     <button type="button" data-admin-toggle aria-label="Toggle menu"><x-icon name="menu" :size="26" /></button>
 </div>
 <div class="admin-shell">
     <aside class="admin-side">
         <a href="{{ route('admin.dashboard') }}" class="brand">
-            <img src="{{ asset('images/swatch-logo-180.png') }}" alt="" width="44" height="44">
-            <span class="brand-name">SWATCH</span>
+            <img src="{{ asset('images/amg-mark.svg') }}" alt="" width="44" height="44">
+            <span class="brand-name">AMG Foundation</span>
         </a>
         <ul class="admin-nav">
             @foreach ($items as [$route, $match, $icon, $label, $count])

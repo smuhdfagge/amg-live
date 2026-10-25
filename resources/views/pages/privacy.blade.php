@@ -1,7 +1,7 @@
 @extends('layouts.app', ['title' => 'Privacy notice'])
 
 @section('content')
-@include('partials.page-head', ['heading' => 'Privacy notice', 'intro' => 'How SWATCH handles the personal information you give us through this website.'])
+@include('partials.page-head', ['heading' => 'Privacy notice', 'intro' => 'How the Aminu Magashi Garba Foundation handles the personal information you give us through this website.'])
 
 <section class="section">
     <div class="wrap">
@@ -16,9 +16,9 @@
             </ul>
             <p>We do not sell or rent your information to anyone. We share it only with staff who need it to respond to you, or where the law requires us to.</p>
             <h2>How long we keep it</h2>
-            <p>We keep messages and applications for as long as we need them to respond and for our records, and then delete them. You can unsubscribe from updates at any time by emailing us.</p>
+            <p>We keep messages and applications for as long as we need them to respond and for our records, and then delete them. You can unsubscribe from updates at any time by contacting us.</p>
             <h2>Your rights</h2>
-            <p>In line with the Nigeria Data Protection Act 2023, you can ask to see, correct or delete the information we hold about you. Email <a href="mailto:{{ config('swatch.contact.email') }}">{{ config('swatch.contact.email') }}</a> and we will respond within 30 days.</p>
+            <p>In line with the Nigeria Data Protection Act 2023, you can ask to see, correct or delete the information we hold about you. @if (filled(config('amg.contact.email')))Email <a href="mailto:{{ config('amg.contact.email') }}">{{ config('amg.contact.email') }}</a>@else<a href="{{ route('contact') }}">Contact us</a>@endif and we will respond within 30 days.</p>
             <h2>Cookies</h2>
             <p>This website uses only the cookies it needs to work, such as the session cookie that protects our forms. We do not use advertising cookies.</p>
         </div>

@@ -45,6 +45,6 @@ class VolunteerController extends Controller
                 ]);
             });
             fclose($out);
-        }, 'swatch-volunteers-'.now()->format('Y-m-d').'.csv', ['Content-Type' => 'text/csv']);
+        }, 'amg-volunteers-'.now()->format('Y-m-d').'.csv', ['Content-Type' => 'text/csv']);
     }
 }

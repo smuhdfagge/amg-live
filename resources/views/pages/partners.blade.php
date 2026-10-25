@@ -1,13 +1,29 @@
-@extends('layouts.app', ['title' => 'Partners', 'description' => 'The organisations SWATCH has delivered programmes with, including Chemonics International, FHI 360, the Society for Family Health, HIFASS and CEDPA.'])
+@extends('layouts.app', ['title' => 'Partners', 'description' => 'How the Aminu Magashi Garba Foundation works with government, development partners, companies and communities, and the organisations we work with.'])
 
 @section('content')
 @include('partials.page-head', [
     'heading' => 'Our partners',
-    'intro' => 'Our programmes have been delivered with national and international organisations. Each partnership has left behind trained people and stronger community structures in Kano.',
+    'intro' => 'Lasting, multi-stakeholder partnerships are at the heart of our mission. No single organisation can meet the needs of vulnerable people alone.',
 ])
 
 <section class="section">
     <div class="wrap">
+        @if ($projects->isEmpty())
+            <div class="split">
+                <div>
+                    <h2>Who we work with</h2>
+                    <p class="lead">We work with anyone who shares our goal of better lives for vulnerable people.</p>
+                </div>
+                <ul class="checklist">
+                    <li><x-icon name="check" :size="20" /> Federal, state and local government agencies</li>
+                    <li><x-icon name="check" :size="20" /> International and national development partners</li>
+                    <li><x-icon name="check" :size="20" /> Hospitals, clinics and health professionals</li>
+                    <li><x-icon name="check" :size="20" /> Companies and their foundations</li>
+                    <li><x-icon name="check" :size="20" /> Community, traditional and religious leaders</li>
+                    <li><x-icon name="check" :size="20" /> Other civil society and community-based organisations</li>
+                </ul>
+            </div>
+        @endif
         <div class="partner-list">
             @foreach ($projects->groupBy('partner') as $partner => $items)
                 @php
@@ -37,16 +53,16 @@
 <section class="section section-mist">
     <div class="wrap split">
         <div>
-            <h2>Why partner with SWATCH</h2>
-            <p class="lead">We know the communities of Kano, and we have the systems to deliver and report on donor-funded work.</p>
+            <h2>Why partner with us</h2>
+            <p class="lead">We bring a clear focus, local roots and a commitment to support that lasts.</p>
+            <p><a class="btn btn-primary" href="{{ route('contact', ['type' => 'partnership']) }}#message">Talk to us about a partnership</a></p>
         </div>
         <ul class="checklist">
-            <li><x-icon name="check" :size="20" /> More than two decades of programme delivery in Kano State</li>
-            <li><x-icon name="check" :size="20" /> Experience across HIV prevention, testing, referral and OVC care</li>
-            <li><x-icon name="check" :size="20" /> Community structures and more than 80 trained volunteers</li>
-            <li><x-icon name="check" :size="20" /> Staff skilled in monitoring and evaluation, financial management and database management</li>
-            <li><x-icon name="check" :size="20" /> Federal registration with the CAC and FIRS</li>
-            <li><x-icon name="check" :size="20" /> A women-led team with a clear gender and inclusion policy</li>
+            <li><x-icon name="check" :size="20" /> Based in Kano and close to the communities we serve</li>
+            <li><x-icon name="check" :size="20" /> A clear focus on the most vulnerable: women, youths, children, the elderly, adolescents and people with disability</li>
+            <li><x-icon name="check" :size="20" /> Work across health, livelihoods and social protection</li>
+            <li><x-icon name="check" :size="20" /> A focus on sustainable financing, so results outlast a single grant</li>
+            <li><x-icon name="check" :size="20" /> Open reporting on what we spend and what changes</li>
         </ul>
     </div>
 </section>

@@ -29,6 +29,6 @@ class SubscriberController extends Controller
             fputcsv($out, ['Email', 'Subscribed on']);
             Subscriber::oldest()->each(fn ($s) => fputcsv($out, [$s->email, $s->created_at->format('Y-m-d')]));
             fclose($out);
-        }, 'swatch-subscribers-'.now()->format('Y-m-d').'.csv', ['Content-Type' => 'text/csv']);
+        }, 'amg-subscribers-'.now()->format('Y-m-d').'.csv', ['Content-Type' => 'text/csv']);
     }
 }

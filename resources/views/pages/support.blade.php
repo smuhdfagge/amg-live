@@ -1,10 +1,10 @@
-@extends('layouts.app', ['title' => 'Support our work', 'description' => 'Ways to support SWATCH: fund a programme, sponsor education, give in kind or make a direct gift to our work with women and children in Kano.'])
-@php $bank = config('swatch.bank'); @endphp
+@extends('layouts.app', ['title' => 'Support our work', 'description' => 'Ways to support the Aminu Magashi Garba Foundation: fund a programme, support a patient, give in kind or make a direct gift.'])
+@php $bank = config('amg.bank'); $c = config('amg.contact'); @endphp
 
 @section('content')
 @include('partials.page-head', [
     'heading' => 'Support our work',
-    'intro' => 'Your support reaches children, caregivers and young women in Kano through programmes that are planned, monitored and reported on.',
+    'intro' => 'Your support reaches vulnerable people through work that is planned, monitored and reported on.',
 ])
 
 <section class="section">
@@ -18,19 +18,19 @@
         <div class="methods">
             <div>
                 <h3>Fund a programme</h3>
-                <p>Back a full programme or one part of it, such as HIV testing outreach, OVC household support or girls' education. We agree targets and reporting with you at the start.</p>
+                <p>Back a full programme or one part of it, in any of our focus areas. We agree targets and reporting with you at the start.</p>
             </div>
             <div>
-                <h3>Sponsor a child's education</h3>
-                <p>Cover school fees, uniforms and learning materials for a vulnerable child, so that he or she stays in school and finishes.</p>
+                <h3>Support a patient</h3>
+                <p>Help a person living with sickle cell disease, cancer or another health challenge to get the treatment and care they need.</p>
             </div>
             <div>
-                <h3>Support a caregiver's livelihood</h3>
-                <p>Provide start-up support and business training for a caregiver, usually a mother or grandmother, so the household can meet its own needs.</p>
+                <h3>Back a livelihood</h3>
+                <p>Give a woman, a young person or a person with disability the skills and start-up support to earn a living.</p>
             </div>
             <div>
                 <h3>Give in kind</h3>
-                <p>Food items, hygiene kits, school supplies, IT equipment or office space all help our programmes go further.</p>
+                <p>Mobility aids, medical supplies, food items, hygiene kits and equipment all help our work go further.</p>
             </div>
             <div>
                 <h3>Share your expertise</h3>
@@ -38,7 +38,7 @@
             </div>
             <div>
                 <h3>Corporate partnership</h3>
-                <p>Companies can link their social investment to measurable results for women and children in Kano.</p>
+                <p>Companies can link their social investment to clear results for vulnerable people and communities.</p>
             </div>
         </div>
     </div>
@@ -56,13 +56,13 @@
                     <div><div><dt>Bank</dt><dd>{{ $bank['bank_name'] }}</dd></div></div>
                 </dl>
             @else
-                <p class="lead">To make a gift, contact our finance team. We will send you our official account details and confirm receipt of every gift in writing.</p>
+                <p class="lead">To make a gift, contact us. We will send you our official account details and confirm receipt of every gift in writing.</p>
                 <div class="btn-row">
                     <a class="btn btn-red" href="{{ route('contact', ['type' => 'support']) }}#message">Request account details</a>
-                    <a class="btn btn-outline" href="tel:{{ config('swatch.contact.phone_link') }}">Call {{ config('swatch.contact.phone') }}</a>
+                    @if (filled($c['phone']))<a class="btn btn-outline" href="tel:{{ $c['phone_link'] }}">Call {{ $c['phone'] }}</a>@endif
                 </div>
             @endif
-            <p class="muted small mt-2">For your safety, SWATCH only receives funds into accounts registered in the organisation's name. We will never ask you to pay into a personal account.</p>
+            <p class="muted small mt-2">For your safety, the Foundation only receives funds into accounts registered in the organisation's name. We will never ask you to pay into a personal account.</p>
         </div>
         <div>
             <h3>How we account for your support</h3>
@@ -76,12 +76,13 @@
     </div>
 </section>
 
+@if ($featured->isNotEmpty())
 <section class="section">
     <div class="wrap">
         <div class="section-head">
             <div>
                 <h2>The kind of work your support makes possible</h2>
-                <p>A few of the programmes we have delivered with our partners.</p>
+                <p>Some of the programmes we run with our partners.</p>
             </div>
             <a class="text-link" href="{{ route('projects.index') }}">All programmes</a>
         </div>
@@ -92,4 +93,5 @@
         </div>
     </div>
 </section>
+@endif
 @endsection

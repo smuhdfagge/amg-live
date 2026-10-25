@@ -1,10 +1,10 @@
-@extends('layouts.app', ['title' => 'Contact us', 'description' => 'Contact SWATCH at Plot 203, New Court Road, Gyadi-Gyadi, Kano. Call 0803 787 3565 or email swatchngo2002@gmail.com.', 'hideCta' => true])
-@php $c = config('swatch.contact'); @endphp
+@extends('layouts.app', ['title' => 'Contact us', 'description' => 'Contact the Aminu Magashi Garba Foundation at No. 9 Kura Road, off Lamido Crescent, Nassarawa GRA, Kano.', 'hideCta' => true])
+@php $c = config('amg.contact'); @endphp
 
 @section('content')
 @include('partials.page-head', [
     'heading' => 'Contact us',
-    'intro' => 'Call, email or visit our office in Kano. You can also send us a message below and we will reply within three working days.',
+    'intro' => 'Visit our office in Kano, or send us a message below and we will reply within three working days.',
 ])
 
 <section class="section">
@@ -12,12 +12,18 @@
         <div>
             <ul class="contact-list">
                 <li><span class="ci"><x-icon name="pin" :size="22" /></span><div><strong>Office</strong><span>{{ $c['address_line_1'] }}, {{ $c['address_line_2'] }}, {{ $c['country'] }}</span></div></li>
-                <li><span class="ci"><x-icon name="phone" :size="22" /></span><div><strong>Phone</strong><a href="tel:{{ $c['phone_link'] }}">{{ $c['phone'] }}</a></div></li>
-                <li><span class="ci"><x-icon name="mail" :size="22" /></span><div><strong>Email</strong><a href="mailto:{{ $c['email'] }}">{{ $c['email'] }}</a><br><a href="mailto:{{ $c['email_alt'] }}">{{ $c['email_alt'] }}</a></div></li>
+                @if (filled($c['phone']))
+                    <li><span class="ci"><x-icon name="phone" :size="22" /></span><div><strong>Phone</strong><a href="tel:{{ $c['phone_link'] }}">{{ $c['phone'] }}</a></div></li>
+                @endif
+                @if (filled($c['email']))
+                    <li><span class="ci"><x-icon name="mail" :size="22" /></span><div><strong>Email</strong><a href="mailto:{{ $c['email'] }}">{{ $c['email'] }}</a>@if (filled($c['email_alt']))<br><a href="mailto:{{ $c['email_alt'] }}">{{ $c['email_alt'] }}</a>@endif</div></li>
+                @endif
+                @if (filled($c['hours']))
                 <li><span class="ci"><x-icon name="clock" :size="22" /></span><div><strong>Office hours</strong><span>{{ $c['hours'] }}</span></div></li>
+                @endif
             </ul>
             <div class="map">
-                <iframe title="Map showing the SWATCH office in Gyadi-Gyadi, Kano" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q={{ urlencode($c['map_query']) }}&z=15&output=embed"></iframe>
+                <iframe title="Map showing the Foundation office in Nassarawa GRA, Kano" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q={{ urlencode($c['map_query']) }}&z=15&output=embed"></iframe>
             </div>
         </div>
 

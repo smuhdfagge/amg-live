@@ -1,4 +1,4 @@
-@extends('layouts.app', ['title' => 'News', 'description' => 'News and updates from SWATCH programmes in Kano, and press coverage of the issues we work on.'])
+@extends('layouts.app', ['title' => 'News', 'description' => 'News and updates from the Aminu Magashi Garba Foundation, and press coverage of the issues we work on.'])
 
 @section('content')
 @include('partials.page-head', [

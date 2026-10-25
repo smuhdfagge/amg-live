@@ -45,7 +45,7 @@
                     @if ($project->location)<dt>Location</dt><dd>{{ $project->location }}</dd>@endif
                     @if ($project->theme)<dt>Focus</dt><dd>{{ $project->theme }}</dd>@endif
                 </dl>
-                <p class="mt-2 mb-0"><a class="btn btn-indigo btn-sm" href="{{ route('contact', ['type' => 'partnership']) }}#message">Talk to us about similar work</a></p>
+                <p class="mt-2 mb-0"><a class="btn btn-primary btn-sm" href="{{ route('contact', ['type' => 'partnership']) }}#message">Talk to us about similar work</a></p>
             </div>
         </aside>
     </div>

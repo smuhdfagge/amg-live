@@ -27,8 +27,8 @@
                 </ol>
             @else
                 <h2>Working in this area</h2>
-                <p>We are building our programme portfolio in this area and welcome conversations with partners who share the goal.</p>
-                <p><a class="btn btn-indigo" href="{{ route('contact', ['type' => 'partnership']) }}#message">Discuss a partnership</a></p>
+                <p>We are building our work in this area and welcome conversations with partners who share the goal.</p>
+                <p><a class="btn btn-primary" href="{{ route('contact', ['type' => 'partnership']) }}#message">Discuss a partnership</a></p>
             @endif
         </div>
         <aside>
@@ -39,7 +39,7 @@
                         @include('partials.area-item', ['area' => $other])
                     @endforeach
                 </div>
-                <p class="mt-2 mb-0"><a class="text-link" href="{{ route('work') }}">All thematic areas</a></p>
+                <p class="mt-2 mb-0"><a class="text-link" href="{{ route('work') }}">All focus areas</a></p>
             </div>
         </aside>
     </div>

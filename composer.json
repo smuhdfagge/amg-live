@@ -1,13 +1,13 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "swatch/website",
+    "name": "amg-foundation/website",
     "type": "project",
-    "description": "Website for Support for Women and Teenage Children (SWATCH), Kano.",
+    "description": "Website for the Aminu Magashi Garba Foundation, Kano.",
     "keywords": [
         "laravel",
         "ngo",
         "kano",
-        "swatch"
+        "amg-foundation"
     ],
     "license": "MIT",
     "require": {

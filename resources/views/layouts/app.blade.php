@@ -1,12 +1,12 @@
 @php
-    $org = config('swatch');
-    $pageTitle = isset($title) ? $title.' | SWATCH' : 'SWATCH | Support for Women and Teenage Children, Kano';
-    $pageDescription = $description ?? 'SWATCH is a women-led, non-profit organisation in Kano, Nigeria. Since 2000 we have run health, education and livelihood programmes for women, girls and children.';
+    $org = config('amg');
+    $pageTitle = isset($title) ? $title.' | AMG Foundation' : 'Aminu Magashi Garba Foundation | Kano, Nigeria';
+    $pageDescription = $description ?? 'The Aminu Magashi Garba Foundation works to improve the lives of vulnerable people and communities in Kano through lasting partnerships, sustainable financing and innovative solutions.';
+    $c = $org['contact'];
     $nav = [
         ['route' => 'about', 'label' => 'About us', 'match' => 'about'],
         ['route' => 'work', 'label' => 'Our work', 'match' => 'work*'],
         ['route' => 'projects.index', 'label' => 'Programmes', 'match' => 'projects.*'],
-        ['route' => 'partners', 'label' => 'Partners', 'match' => 'partners'],
         ['route' => 'news.index', 'label' => 'News', 'match' => 'news.*'],
         ['route' => 'involved', 'label' => 'Get involved', 'match' => 'involved'],
         ['route' => 'contact', 'label' => 'Contact', 'match' => 'contact'],
@@ -20,10 +20,10 @@
     <title>{{ $pageTitle }}</title>
     <meta name="description" content="{{ $pageDescription }}">
     <link rel="canonical" href="{{ url()->current() }}">
-    <meta name="theme-color" content="#2b245a">
+    <meta name="theme-color" content="#00733a">
 
     <meta property="og:type" content="website">
-    <meta property="og:site_name" content="SWATCH">
+    <meta property="og:site_name" content="Aminu Magashi Garba Foundation">
     <meta property="og:title" content="{{ $pageTitle }}">
     <meta property="og:description" content="{{ $pageDescription }}">
     <meta property="og:url" content="{{ url()->current() }}">
@@ -35,53 +35,51 @@
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
 
-    <link rel="preload" href="{{ asset('fonts/young-serif-latin-400-normal.woff2') }}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{{ asset('fonts/archivo-latin-variable.woff2') }}" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="{{ asset('fonts/figtree-latin-400-normal.woff2') }}" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="{{ asset('css/site.css') }}?v={{ filemtime(public_path('css/site.css')) }}">
 
     <script type="application/ld+json">
-    {!! json_encode([
+    {!! json_encode(array_filter([
         '@context' => 'https://schema.org',
         '@type' => 'NGO',
         'name' => $org['name'],
-        'alternateName' => 'SWATCH',
+        'alternateName' => 'AMG Foundation',
         'url' => url('/'),
-        'logo' => asset('images/swatch-logo.png'),
-        'foundingDate' => (string) $org['founded'],
-        'email' => $org['contact']['email'],
-        'telephone' => $org['contact']['phone_link'],
+        'logo' => asset('images/amg-logo.png'),
+        'foundingDate' => filled($org['founded']) ? (string) $org['founded'] : null,
+        'email' => $c['email'] ?: null,
+        'telephone' => $c['phone_link'] ?: null,
         'address' => [
             '@type' => 'PostalAddress',
-            'streetAddress' => $org['contact']['address_line_1'],
-            'addressLocality' => 'Kano',
+            'streetAddress' => $c['address_line_1'],
+            'addressLocality' => 'Nassarawa GRA, Kano',
             'addressRegion' => 'Kano State',
             'addressCountry' => 'NG',
         ],
-    ], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
+    ]), JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
     </script>
     @stack('head')
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to main content</a>
 
+@if (filled($c['phone']) || filled($c['email']) || filled($org['registration']['cac']))
 <div class="topbar">
     <div class="wrap">
-        <span>Registered NGO, {{ $org['registration']['cac'] }}</span>
+        <span>@if (filled($org['registration']['cac']))Registered NGO, {{ $org['registration']['cac'] }}@else{{ $c['address_line_2'] }}@endif</span>
         <div class="topbar-contacts">
-            <span><x-icon name="phone" :size="16" /><a href="tel:{{ $org['contact']['phone_link'] }}">{{ $org['contact']['phone'] }}</a></span>
-            <span><x-icon name="mail" :size="16" /><a href="mailto:{{ $org['contact']['email'] }}">{{ $org['contact']['email'] }}</a></span>
+            @if (filled($c['phone']))<span><x-icon name="phone" :size="16" /><a href="tel:{{ $c['phone_link'] }}">{{ $c['phone'] }}</a></span>@endif
+            @if (filled($c['email']))<span><x-icon name="mail" :size="16" /><a href="mailto:{{ $c['email'] }}">{{ $c['email'] }}</a></span>@endif
         </div>
     </div>
 </div>
+@endif
 
 <header class="site-header">
     <div class="wrap">
-        <a href="{{ route('home') }}" class="brand" aria-label="SWATCH home">
-            <img src="{{ asset('images/swatch-logo-180.png') }}" alt="" width="54" height="54">
-            <span>
-                <span class="brand-name">SWATCH</span>
-                <span class="brand-sub">Support for Women and Teenage Children</span>
-            </span>
+        <a href="{{ route('home') }}" class="brand" aria-label="Aminu Magashi Garba Foundation home">
+            <img src="{{ asset('images/amg-logo.svg') }}" alt="" width="170" height="83">
         </a>
 
         <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="main-nav" data-nav-toggle>
@@ -109,8 +107,8 @@
 <section class="cta-band" aria-labelledby="cta-heading">
     <div class="wrap">
         <div>
-            <h2 id="cta-heading">Work with us in Kano</h2>
-            <p>We are open to funding partners, implementing partners and volunteers who share our goals for women, girls and children.</p>
+            <h2 id="cta-heading">Partner with us</h2>
+            <p>We welcome government agencies, development partners, companies, foundations and volunteers who want to make a lasting difference for vulnerable people.</p>
         </div>
         <div class="btn-row">
             <a class="btn btn-white" href="{{ route('contact', ['type' => 'partnership']) }}#message">Talk to us about a partnership</a>
@@ -121,23 +119,24 @@
 @endunless
 
 <footer class="site-footer">
-    <div class="footer-laurel">@include('partials.laurel')</div>
+    <div class="footer-motif">@include('partials.motif')</div>
     <div class="wrap footer-main">
         <div>
             <div class="footer-brand">
-                <img src="{{ asset('images/swatch-logo-180.png') }}" alt="" width="60" height="60" loading="lazy">
-                <div>
-                    <strong>SWATCH</strong>
-                    <span>Support for Women and Teenage Children</span>
-                </div>
+                <img src="{{ asset('images/amg-logo-white.svg') }}" alt="Aminu Magashi Garba Foundation" width="190" height="93" loading="lazy">
             </div>
-            <p>A women-led, non-governmental, non-partisan and not-for-profit organisation, working in Kano since {{ $org['founded'] }}.</p>
-            <p class="small">CAC registration: {{ $org['registration']['cac'] }}<br>FIRS TIN: {{ $org['registration']['tin'] }}</p>
+            <p>A non-profit foundation improving the lives of vulnerable people and communities through partnerships, sustainable financing and innovative solutions.</p>
+            @if (filled($org['registration']['cac']) || filled($org['registration']['tin']))
+                <p class="small">
+                    @if (filled($org['registration']['cac']))CAC registration: {{ $org['registration']['cac'] }}<br>@endif
+                    @if (filled($org['registration']['tin']))FIRS TIN: {{ $org['registration']['tin'] }}@endif
+                </p>
+            @endif
             @php $socials = array_filter($org['social']); @endphp
             @if ($socials)
                 <div class="social">
                     @foreach ($socials as $network => $link)
-                        <a href="{{ $link }}" target="_blank" rel="noopener" aria-label="SWATCH on {{ $network === 'x' ? 'X' : ucfirst($network) }}"><x-icon :name="$network" :size="20" /></a>
+                        <a href="{{ $link }}" target="_blank" rel="noopener" aria-label="AMG Foundation on {{ $network === 'x' ? 'X' : ucfirst($network) }}"><x-icon :name="$network" :size="20" /></a>
                     @endforeach
                 </div>
             @endif
@@ -146,7 +145,7 @@
             <h2>Organisation</h2>
             <ul class="footer-links">
                 <li><a href="{{ route('about') }}">About us</a></li>
-                <li><a href="{{ route('about') }}#governance">Governance</a></li>
+                <li><a href="{{ route('about') }}#objectives">Our objectives</a></li>
                 <li><a href="{{ route('partners') }}">Partners</a></li>
                 <li><a href="{{ route('news.index') }}">News</a></li>
                 <li><a href="{{ route('privacy') }}">Privacy notice</a></li>
@@ -155,19 +154,19 @@
         <div>
             <h2>Our work</h2>
             <ul class="footer-links">
-                <li><a href="{{ route('work') }}">Thematic areas</a></li>
-                <li><a href="{{ route('projects.index') }}">Programme record</a></li>
+                <li><a href="{{ route('work') }}">Focus areas</a></li>
+                <li><a href="{{ route('projects.index') }}">Programmes</a></li>
                 <li><a href="{{ route('involved') }}">Volunteer</a></li>
                 <li><a href="{{ route('support') }}">Support our work</a></li>
                 <li><a href="{{ route('contact') }}">Contact us</a></li>
             </ul>
         </div>
         <div>
-            <h2>Visit or call</h2>
+            <h2>Visit us</h2>
             <ul class="footer-contact">
-                <li><x-icon name="pin" :size="18" /><span>{{ $org['contact']['address_line_1'] }},<br>{{ $org['contact']['address_line_2'] }}, {{ $org['contact']['country'] }}</span></li>
-                <li><x-icon name="phone" :size="18" /><a href="tel:{{ $org['contact']['phone_link'] }}">{{ $org['contact']['phone'] }}</a></li>
-                <li><x-icon name="mail" :size="18" /><a href="mailto:{{ $org['contact']['email'] }}">{{ $org['contact']['email'] }}</a></li>
+                <li><x-icon name="pin" :size="18" /><span>{{ $c['address_line_1'] }},<br>{{ $c['address_line_2'] }}, {{ $c['country'] }}</span></li>
+                @if (filled($c['phone']))<li><x-icon name="phone" :size="18" /><a href="tel:{{ $c['phone_link'] }}">{{ $c['phone'] }}</a></li>@endif
+                @if (filled($c['email']))<li><x-icon name="mail" :size="18" /><a href="mailto:{{ $c['email'] }}">{{ $c['email'] }}</a></li>@endif
             </ul>
             <h2 class="mt-2" id="subscribe-heading">Get our updates</h2>
             <form class="subscribe" method="POST" action="{{ route('subscribe') }}" aria-labelledby="subscribe-heading">
@@ -187,8 +186,8 @@
     </div>
     <div class="footer-bottom">
         <div class="wrap">
-            <span>&copy; {{ date('Y') }} Support for Women and Teenage Children (SWATCH). All rights reserved.</span>
-            <span>Plot 203, New Court Road, Gyadi-Gyadi, Kano</span>
+            <span>&copy; {{ date('Y') }} Aminu Magashi Garba Foundation. All rights reserved.</span>
+            <span>{{ $c['address_line_1'] }}, {{ $c['address_line_2'] }}</span>
         </div>
     </div>
 </footer>

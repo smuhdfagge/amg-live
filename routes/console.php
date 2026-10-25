@@ -5,11 +5,11 @@ use App\Models\User;
 use Illuminate\Support\Facades\Artisan;
 
 /*
-| Seeds the starting content (admin account, programmes, first news item)
-| only when the database is empty. Safe to run on every deployment: it
-| never overwrites an admin password or programme edits made later.
+| Creates the first admin account only when the database is empty. Safe to
+| run on every deployment: it never overwrites an admin password or any
+| programmes and news added later through the admin area.
 */
-Artisan::command('swatch:seed-if-empty', function () {
+Artisan::command('amg:seed-if-empty', function () {
     if (User::query()->exists() || Project::query()->exists()) {
         $this->info('Content already in place. Skipping the seeder.');
 
@@ -17,7 +17,7 @@ Artisan::command('swatch:seed-if-empty', function () {
     }
 
     $this->call('db:seed', ['--force' => true]);
-    $this->info('Starting content added. Sign in at /admin with ADMIN_EMAIL and ADMIN_PASSWORD from .env.');
+    $this->info('Admin account created. Sign in at /admin with ADMIN_EMAIL and ADMIN_PASSWORD from .env.');
 
     return 0;
-})->purpose('Add the starting SWATCH content when the database is empty');
+})->purpose('Create the first admin account when the database is empty');

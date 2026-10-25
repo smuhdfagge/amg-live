@@ -3,7 +3,7 @@
         @if ($post->coverUrl())
             <img src="{{ $post->coverUrl() }}" alt="" loading="lazy">
         @else
-            <span class="laurel-mark" style="width:46%;opacity:.45;display:block">@include('partials.laurel')</span>
+            <span class="motif-mark" style="width:46%;opacity:.45;display:block">@include('partials.motif')</span>
         @endif
     </div>
     <div class="news-meta">

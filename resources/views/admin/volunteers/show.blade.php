@@ -15,7 +15,7 @@
     @if ($volunteer->skills)<h2>Skills and experience</h2><div class="message-body">{{ $volunteer->skills }}</div>@endif
     @if ($volunteer->message)<h2 class="mt-2">Message</h2><div class="message-body">{{ $volunteer->message }}</div>@endif
     <div class="form-actions">
-        <a class="btn btn-indigo" href="tel:{{ $volunteer->phone }}"><x-icon name="phone" :size="18" /> Call</a>
+        <a class="btn btn-primary" href="tel:{{ $volunteer->phone }}"><x-icon name="phone" :size="18" /> Call</a>
         <a class="btn btn-outline" href="mailto:{{ $volunteer->email }}">Email</a>
         <form method="POST" action="{{ route('admin.volunteers.destroy', $volunteer) }}" data-confirm="Delete this application?">@csrf @method('DELETE')<button class="btn btn-outline" type="submit">Delete</button></form>
     </div>

@@ -1,21 +1,23 @@
-# SWATCH website
+# Aminu Magashi Garba Foundation website
 
-The website of Support for Women and Teenage Children (SWATCH), a women-led NGO in Kano, Nigeria. Built with Laravel 13.
+The website of the Aminu Magashi Garba Foundation (AMG Foundation), a non-profit based in Kano, Nigeria. Built with Laravel 13.
 
 ## What is included
 
 **Public pages**
 
-- Home, with the programme record, reach figures, thematic areas, recent programmes and news
-- About us: history, vision and mission, governance, team, registration details
-- Our work: ten thematic areas, each with its own page, plus how SWATCH works
-- Programmes: the full programme record and a page for each programme
-- Partners: every partner organisation and the work done together
+- Home, with the mission, the groups the Foundation serves, focus areas, objectives, programmes and news
+- About us: who we are, vision, mission, objectives, office and registration details
+- Our work: ten focus areas, each with its own page, plus how the Foundation works
+- Programmes: added through the admin area, each with its own page
+- Partners: who the Foundation works with, plus a list built from the programmes
 - News, with support for stories written on the site and links to press coverage
 - Get involved, with a volunteer application form
 - Support our work, with ways to give (bank details appear once you add them)
 - Contact, with an enquiry form and map
-- Privacy notice, sitemap.xml, custom error pages, and redirects from the old WordPress addresses
+- Privacy notice, sitemap.xml and custom error pages
+
+Sections with nothing to show yet (programmes, news, phone, email, registration numbers) stay hidden until you add them.
 
 **Admin area** at `/admin`
 
@@ -27,7 +29,16 @@ The website of Support for Women and Teenage Children (SWATCH), a women-led NGO 
 - View and export newsletter subscribers
 - Change your own name, email and password
 
-Every form is protected against spam with a hidden field and rate limits, and sends an email alert to `SWATCH_NOTIFY_EMAIL`.
+Every form is protected against spam with a hidden field and rate limits, and sends an email alert to `AMG_NOTIFY_EMAIL`.
+
+## Logo
+
+`public/images/` holds the logo in several forms:
+
+- `amg-logo.svg`: the full logo as a vector. It stays sharp at any size, so use it for print and large banners.
+- `amg-logo.png`: the same logo at 2700 pixels wide, with a transparent background.
+- `amg-logo-white.svg` / `.png`: white lettering for dark backgrounds (used in the footer).
+- `amg-mark.svg` / `amg-mark-512.png`: a square AMG icon, used for the favicon and the admin area.
 
 ## Requirements
 
@@ -55,33 +66,34 @@ Run the tests with `php artisan test`.
 
 ## Deploy to a server
 
-Use the deploy script. It finds a suitable PHP binary, checks extensions, pulls the latest code, installs packages, runs migrations, adds the starting content on the first deploy only, links storage and caches everything. The site goes into maintenance mode during the update and always comes back up, even if a step fails.
+Use the deploy script. It finds a suitable PHP binary, checks extensions, pulls the latest code, installs packages, runs migrations, creates the first admin account on the first deploy only, links storage and caches everything. The site goes into maintenance mode during the update and always comes back up, even if a step fails.
 
 ### First deploy
 
 ```bash
-git clone https://github.com/smuhdfagge/swatch-live.git ~/swatch
-cd ~/swatch
+git clone https://github.com/smuhdfagge/amg-live.git ~/amg
+cd ~/amg
 bash deploy.sh
 ```
 
 The first run creates `.env` and stops. Open it and fill in:
 
-- `APP_URL=https://swatch.org.ng`
+- `APP_URL=https://aminumagashigarbafoundation.org`
 - the database settings (`DB_CONNECTION=mysql`, `DB_HOST`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`)
 - mail settings (`MAIL_MAILER=smtp` and your SMTP details) so form alerts are delivered
 - `ADMIN_EMAIL` and a strong `ADMIN_PASSWORD`
+- the Foundation's phone, email and registration details (`AMG_PHONE`, `AMG_EMAIL`, `AMG_CAC` and so on)
 
 Then run `bash deploy.sh` again.
 
 ### Where the site is served from
 
-- **VPS, or cPanel where you can set the document root:** point the domain to `~/swatch/public` and run `bash deploy.sh`.
-- **cPanel where the site must live in `public_html`:** run `bash deploy.sh --public-html ~/public_html`. The script copies the public files there, writes an `index.php` that loads the app from `~/swatch`, and links the uploads folder.
+- **VPS, or cPanel where you can set the document root:** point the domain to `~/amg/public` and run `bash deploy.sh`.
+- **cPanel where the site must live in `public_html`:** run `bash deploy.sh --public-html ~/public_html`. The script copies the public files there, writes an `index.php` that loads the app from `~/amg`, and links the uploads folder.
 
 ### Updating the live site
 
-Push your changes to GitHub, then on the server run the same command again (`bash deploy.sh`, or with `--public-html` if you use it). Re-running is safe. It never resets the admin password or overwrites content edited in the admin. Use `--seed` only if you deliberately want to restore the starting content.
+Push your changes to GitHub, then on the server run the same command again (`bash deploy.sh`, or with `--public-html` if you use it). Re-running is safe. It never resets the admin password or overwrites content edited in the admin. Use `--seed` only if you deliberately want to re-run the database seeder.
 
 Other options: `--no-pull` (when you upload files by FTP), `--branch NAME`, and `--php /path/to/php` to choose the PHP binary yourself. Run `bash deploy.sh --help` for the full list.
 
@@ -92,7 +104,7 @@ For cPanel's Git Version Control, see `deploy/cpanel.yml.example`.
 If your host runs the build for you, set its PHP version to 8.3 or 8.4 and use:
 
 - Build: `composer install --no-dev --optimize-autoloader`
-- Deploy: `php artisan migrate --force && php artisan swatch:seed-if-empty && php artisan storage:link && php artisan optimize`
+- Deploy: `php artisan migrate --force && php artisan amg:seed-if-empty && php artisan storage:link && php artisan optimize`
 
 ### About the lock file and PHP versions
 
@@ -103,7 +115,7 @@ If you ever see that error, check which PHP Composer is really using with `php -
 ## Editing content
 
 - **News and programmes:** use the admin area.
-- **Organisation details** (address, phone, emails, registration numbers, vision, mission, team numbers, thematic areas): edit `config/swatch.php`. Contact details, social links and bank details can also be set from `.env`.
+- **Organisation details** (address, vision, mission, objectives, focus areas, ways of working): edit `config/amg.php`. Phone, emails, registration numbers, social links and bank details are set from `.env`.
 - **Logo and colours:** the logo is in `public/images/`. Brand colours are at the top of `public/css/site.css`.
 
-Programme figures come from SWATCH's own records. Please check them, and the "Most recent" period for SHARP Task Order 3, before launch.
+The focus area descriptions in `config/amg.php` are written from the Foundation's mission and objectives. Please review them before launch.

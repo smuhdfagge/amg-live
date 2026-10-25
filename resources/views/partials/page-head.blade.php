@@ -1,5 +1,5 @@
 <section class="page-head">
-    <div class="page-head-laurel">@include('partials.laurel')</div>
+    <div class="page-head-motif">@include('partials.motif')</div>
     <div class="wrap">
         <nav class="crumbs" aria-label="Breadcrumb">
             <ol>

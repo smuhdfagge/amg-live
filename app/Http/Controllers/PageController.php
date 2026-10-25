@@ -12,10 +12,9 @@ class PageController extends Controller
     public function home(): View
     {
         return view('pages.home', [
-            'timeline' => Project::ordered()->get(),
             'featured' => Project::where('is_featured', true)->ordered()->take(3)->get(),
             'posts' => Post::published()->take(3)->get(),
-            'areas' => collect(config('swatch.thematic_areas')),
+            'areas' => collect(config('amg.thematic_areas')),
         ]);
     }
 
@@ -29,13 +28,13 @@ class PageController extends Controller
     public function work(): View
     {
         return view('pages.work', [
-            'areas' => collect(config('swatch.thematic_areas')),
+            'areas' => collect(config('amg.thematic_areas')),
         ]);
     }
 
     public function area(string $area): View
     {
-        $areas = collect(config('swatch.thematic_areas'));
+        $areas = collect(config('amg.thematic_areas'));
         $current = $areas->firstWhere('slug', $area);
 
         abort_unless($current, 404);
@@ -84,7 +83,7 @@ class PageController extends Controller
             route('home'), route('about'), route('work'), route('projects.index'), route('partners'),
             route('news.index'), route('involved'), route('support'), route('contact'),
         ])
-            ->merge(collect(config('swatch.thematic_areas'))->map(fn ($a) => route('work.area', $a['slug'])))
+            ->merge(collect(config('amg.thematic_areas'))->map(fn ($a) => route('work.area', $a['slug'])))
             ->merge(Project::pluck('slug')->map(fn ($s) => route('projects.show', $s)))
             ->merge(Post::published()->whereNotNull('body')->pluck('slug')->map(fn ($s) => route('news.show', $s)));
 
@@ -95,10 +94,20 @@ class PageController extends Controller
     {
         $theme = strtolower((string) $project->theme);
 
-        return match ($slug) {
-            'health' => str_contains($theme, 'hiv') || str_contains($theme, 'health'),
-            'orphans-and-vulnerable-children' => str_contains($theme, 'orphan'),
-            default => str_contains($theme, strtolower(str_replace('-', ' ', $slug))),
+        $keywords = match ($slug) {
+            'sickle-cell-and-blood-disorders' => ['sickle', 'blood'],
+            'mental-health' => ['mental'],
+            'cancer-support' => ['cancer'],
+            'disability-inclusion' => ['disab'],
+            'women-and-girls' => ['women', 'girl'],
+            'youths-and-adolescents' => ['youth', 'adolescent', 'young'],
+            'children' => ['child'],
+            'the-elderly' => ['elder', 'older', 'aged'],
+            'innovative-financing' => ['financ', 'livelihood'],
+            'humanitarian-response' => ['humanitarian', 'emergenc', 'relief'],
+            default => [str_replace('-', ' ', $slug)],
         };
+
+        return collect($keywords)->contains(fn ($k) => str_contains($theme, $k));
     }
 }

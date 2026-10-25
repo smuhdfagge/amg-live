@@ -1,10 +1,10 @@
-@extends('layouts.app', ['title' => 'Get involved', 'description' => 'Volunteer with SWATCH in Kano, partner with us on a programme, or support our work with women, girls and children.'])
+@extends('layouts.app', ['title' => 'Get involved', 'description' => 'Volunteer with the Aminu Magashi Garba Foundation in Kano, partner with us, or support our work with vulnerable people.'])
 @php use App\Models\VolunteerApplication as V; @endphp
 
 @section('content')
 @include('partials.page-head', [
     'heading' => 'Get involved',
-    'intro' => 'More than 80 volunteers work with us across Kano. You can join them, bring your organisation in as a partner, or support a programme directly.',
+    'intro' => 'Give your time as a volunteer, bring your organisation in as a partner, or support our work directly.',
 ])
 
 <section class="section section-mist">
@@ -13,20 +13,20 @@
             <div class="way">
                 <span class="way-icon"><x-icon name="hand" :size="26" /></span>
                 <h3>Volunteer</h3>
-                <p>Help in the field, support our digital and data work, or join our advocacy. Training is provided.</p>
-                <a class="btn btn-indigo btn-sm" href="#volunteer">Apply below</a>
+                <p>Help in the community, support our health outreach, or lend your digital, data or communications skills.</p>
+                <a class="btn btn-primary btn-sm" href="#volunteer">Apply below</a>
             </div>
             <div class="way">
                 <span class="way-icon"><x-icon name="handshake" :size="26" /></span>
                 <h3>Partner</h3>
                 <p>Development agencies, foundations, companies and government bodies can work with us to design and deliver programmes.</p>
-                <a class="btn btn-indigo btn-sm" href="{{ route('contact', ['type' => 'partnership']) }}#message">Contact our team</a>
+                <a class="btn btn-primary btn-sm" href="{{ route('contact', ['type' => 'partnership']) }}#message">Contact our team</a>
             </div>
             <div class="way">
                 <span class="way-icon"><x-icon name="gift" :size="26" /></span>
                 <h3>Support</h3>
-                <p>Fund a programme, sponsor a child's education or give in kind. We report back on how your support is used.</p>
-                <a class="btn btn-indigo btn-sm" href="{{ route('support') }}">Ways to give</a>
+                <p>Fund a programme, support a patient's treatment or give in kind. We report back on how your support is used.</p>
+                <a class="btn btn-primary btn-sm" href="{{ route('support') }}">Ways to give</a>
             </div>
         </div>
     </div>
@@ -35,16 +35,16 @@
 <section class="section anchor-offset" id="volunteer">
     <div class="wrap split">
         <div>
-            <h2>Volunteer with SWATCH</h2>
-            <p class="lead">Our volunteers are part of every programme. They visit households, run community sessions, follow up referrals and keep our records accurate.</p>
+            <h2>Volunteer with the Foundation</h2>
+            <p class="lead">Volunteers help us reach more people. They support community activities, health outreach, events and the day-to-day running of the Foundation.</p>
             <h3 class="mt-2">What to expect</h3>
             <ol class="prose" style="padding-left:1.2rem">
                 <li>Send in the form. It takes about five minutes.</li>
-                <li>Our volunteer coordinator calls you to talk about your interests and availability.</li>
-                <li>You attend an orientation on our safeguarding rules, values and ways of working.</li>
+                <li>A member of our team contacts you to talk about your interests and availability.</li>
+                <li>You attend a short orientation on our values, safeguarding rules and ways of working.</li>
                 <li>We match you to a programme or team that needs your skills.</li>
             </ol>
-            <p class="muted small">Volunteers who work directly with children must agree to our safeguarding policy and may be asked for references.</p>
+            <p class="muted small">Volunteers who work directly with children or vulnerable adults must agree to our safeguarding policy and may be asked for references.</p>
         </div>
 
         <div class="form-panel">

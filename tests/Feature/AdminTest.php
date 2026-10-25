@@ -6,7 +6,6 @@ use App\Models\ContactMessage;
 use App\Models\Post;
 use App\Models\Project;
 use App\Models\User;
-use Database\Seeders\ProjectSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -18,7 +17,15 @@ class AdminTest extends TestCase
 
     private function admin(): User
     {
-        return User::create(['name' => 'Admin', 'email' => 'admin@swatch.test', 'password' => 'secret-password']);
+        return User::create(['name' => 'Admin', 'email' => 'admin@amg.test', 'password' => 'secret-password']);
+    }
+
+    private function sampleProject(): Project
+    {
+        return Project::create([
+            'slug' => 'sickle-cell-support', 'title' => 'Sickle cell support programme', 'period' => '2026',
+            'start_year' => 2026, 'status' => 'ongoing', 'theme' => 'Sickle cell', 'summary' => 'Helping patients reach care.',
+        ]);
     }
 
     public function test_admin_pages_need_sign_in(): void
@@ -31,10 +38,10 @@ class AdminTest extends TestCase
     {
         $this->admin();
 
-        $this->post('/admin/login', ['email' => 'admin@swatch.test', 'password' => 'wrong'])->assertSessionHasErrors('email');
+        $this->post('/admin/login', ['email' => 'admin@amg.test', 'password' => 'wrong'])->assertSessionHasErrors('email');
         $this->assertGuest();
 
-        $this->post('/admin/login', ['email' => 'admin@swatch.test', 'password' => 'secret-password'])->assertRedirect(route('admin.dashboard'));
+        $this->post('/admin/login', ['email' => 'admin@amg.test', 'password' => 'secret-password'])->assertRedirect(route('admin.dashboard'));
         $this->assertAuthenticated();
 
         $this->post('/admin/logout')->assertRedirect('/admin/login');
@@ -43,11 +50,11 @@ class AdminTest extends TestCase
 
     public function test_every_admin_screen_loads(): void
     {
-        $this->seed(ProjectSeeder::class);
+        $this->sampleProject();
         $user = $this->admin();
 
         foreach (['/admin', '/admin/posts', '/admin/posts/create', '/admin/projects', '/admin/projects/create',
-            '/admin/projects/lopin-3/edit', '/admin/messages', '/admin/volunteers', '/admin/subscribers', '/admin/account'] as $url) {
+            '/admin/projects/sickle-cell-support/edit', '/admin/messages', '/admin/volunteers', '/admin/subscribers', '/admin/account'] as $url) {
             $this->actingAs($user)->get($url)->assertOk();
         }
     }
@@ -78,15 +85,14 @@ class AdminTest extends TestCase
 
     public function test_admin_can_edit_a_programme(): void
     {
-        $this->seed(ProjectSeeder::class);
-        $project = Project::firstWhere('slug', 'sidhas');
+        $project = $this->sampleProject();
 
         $this->actingAs($this->admin())->put(route('admin.projects.update', $project), [
-            'title' => $project->title, 'short_title' => 'SIDHAS', 'summary' => 'Updated summary for donors.',
+            'title' => $project->title, 'short_title' => 'Sickle cell support', 'summary' => 'Updated summary for donors.',
             'status' => 'completed', 'sort_order' => 5,
         ])->assertRedirect(route('admin.projects.index'));
 
-        $this->get('/programmes/sidhas')->assertSee('Updated summary for donors.');
+        $this->get('/programmes/sickle-cell-support')->assertSee('Updated summary for donors.');
     }
 
     public function test_opening_a_message_marks_it_read(): void

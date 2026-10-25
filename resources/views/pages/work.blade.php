@@ -1,16 +1,16 @@
-@extends('layouts.app', ['title' => 'Our work', 'description' => 'The thematic areas SWATCH works on in Kano: health, orphans and vulnerable children, education, nutrition, inclusion, livelihoods, WASH, rights and governance.'])
+@extends('layouts.app', ['title' => 'Our work', 'description' => 'What the Aminu Magashi Garba Foundation works on: sickle cell and blood disorders, mental health, cancer, disability, women, youths, children, the elderly, innovative financing and humanitarian response.'])
 
 @section('content')
 @include('partials.page-head', [
     'heading' => 'Our work',
-    'intro' => 'We run evidence-based programmes in health, education and community development. Our longest experience is in HIV services and in the care of orphans and vulnerable children.',
+    'intro' => 'We empower the most vulnerable people in society and work to ease the suffering of people living with ill health and disability.',
 ])
 
 <section class="section">
     <div class="wrap">
         <div class="section-head">
             <div>
-                <h2>Thematic areas</h2>
+                <h2>Focus areas</h2>
                 <p>Select an area to read more about it and see related programmes.</p>
             </div>
         </div>
@@ -27,11 +27,11 @@
         <div class="section-head">
             <div>
                 <h2>How we work</h2>
-                <p>The same set of methods runs through every programme, whatever the theme.</p>
+                <p>The same principles run through everything we do, whatever the focus area.</p>
             </div>
         </div>
         <div class="methods">
-            @foreach (config('swatch.methods') as $method)
+            @foreach (config('amg.methods') as $method)
                 <div>
                     <h3>{{ $method['title'] }}</h3>
                     <p>{{ $method['text'] }}</p>
@@ -49,12 +49,12 @@
         </div>
         <div class="stack">
             <div>
-                <h3>Evidence first</h3>
-                <p class="muted">We ground our programmes in research and proven practice, and we measure results so we can show what worked and fix what did not.</p>
+                <h3>People first</h3>
+                <p class="muted">We start from the needs of the people we serve and treat every person with dignity, whatever their age, health or ability.</p>
             </div>
             <div>
-                <h3>Led by the community</h3>
-                <p class="muted">We work with communities as partners. Ward leaders, caregivers and young people help shape the solutions, and they stay involved after we leave.</p>
+                <h3>Together with others</h3>
+                <p class="muted">We work with communities, government and partners, so that each brings what it does best and the results last.</p>
             </div>
             <div>
                 <h3>Built to last</h3>

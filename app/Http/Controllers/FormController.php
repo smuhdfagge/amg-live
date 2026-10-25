@@ -92,7 +92,7 @@ class FormController extends Controller
 
     private function notify(string $subject, string $body, string $replyTo): void
     {
-        $to = config('swatch.notify_email');
+        $to = config('amg.notify_email');
 
         if (blank($to)) {
             return;

@@ -1,13 +1,24 @@
-@extends('layouts.app', ['title' => 'Programmes', 'description' => 'The programmes SWATCH has delivered in Kano since 2007, with partners, locations and results.'])
+@extends('layouts.app', ['title' => 'Programmes', 'description' => 'Programmes run by the Aminu Magashi Garba Foundation, with partners, locations and results.'])
 
 @section('content')
 @include('partials.page-head', [
-    'heading' => 'Programme record',
-    'intro' => 'The major programmes we have delivered since 2007, most recent first, with the partners we worked with and the results we reported.',
+    'heading' => 'Our programmes',
+    'intro' => 'Our programmes, most recent first, with the partners we work with and the results we report.',
 ])
 
 <section class="section">
     <div class="wrap">
+        @if ($projects->isEmpty())
+            <div class="split">
+                <div>
+                    <h2>Programmes are on the way</h2>
+                    <p class="lead">Details of our programmes will appear here as they are published.</p>
+                </div>
+                <div>
+                    <p>In the meantime, read about the <a href="{{ route('work') }}">areas we focus on</a>, or <a href="{{ route('contact', ['type' => 'partnership']) }}#message">talk to us</a> about working together.</p>
+                </div>
+            </div>
+        @endif
         <ol class="ledger">
             @foreach ($projects as $project)
                 <li class="ledger-item">

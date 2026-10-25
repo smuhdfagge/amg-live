@@ -11,16 +11,11 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         User::updateOrCreate(
-            ['email' => env('ADMIN_EMAIL', 'admin@swatch.org.ng')],
+            ['email' => env('ADMIN_EMAIL', 'admin@aminumagashigarbafoundation.org')],
             [
-                'name' => env('ADMIN_NAME', 'SWATCH Admin'),
+                'name' => env('ADMIN_NAME', 'AMG Foundation Admin'),
                 'password' => Hash::make(env('ADMIN_PASSWORD', 'ChangeMe@2026')),
             ],
         );
-
-        $this->call([
-            ProjectSeeder::class,
-            PostSeeder::class,
-        ]);
     }
 }
