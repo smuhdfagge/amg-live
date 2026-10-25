@@ -11,6 +11,7 @@
 #   --public-html PATH   Copy the public folder into PATH and point its index.php back to this project
 #   --no-pull            Skip "git pull" (use when you upload files by FTP or File Manager)
 #   --branch NAME        Branch to pull (default: main)
+#   --env NAME           Environment for a new .env: production (default) or staging
 #   --seed               Run the database seeder even when content exists (resets the admin password!)
 #   --php PATH           Use this PHP binary instead of searching for one
 #   -h, --help           Show this help
@@ -25,6 +26,7 @@ set -Eeuo pipefail
 
 MIN_PHP="8.3.0"
 BRANCH="main"
+APP_ENV_NAME="production"
 PULL=1
 FORCE_SEED=0
 PUBLIC_HTML=""
@@ -41,7 +43,7 @@ ok()   { printf '%s    %s%s\n' "$green" "$*" "$reset"; }
 warn() { printf '%s    %s%s\n' "$yellow" "$*" "$reset"; }
 fail() { printf '\n%sERROR: %s%s\n' "$red" "$*" "$reset" >&2; exit 1; }
 
-usage() { sed -n '3,22p' "$0" | sed 's/^# \{0,1\}//'; exit 0; }
+usage() { sed -n '3,23p' "$0" | sed 's/^# \{0,1\}//'; exit 0; }
 
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -50,6 +52,8 @@ while [ $# -gt 0 ]; do
         --no-pull) PULL=0; shift ;;
         --branch) BRANCH="${2:-main}"; shift 2 ;;
         --branch=*) BRANCH="${1#*=}"; shift ;;
+        --env) APP_ENV_NAME="${2:-production}"; shift 2 ;;
+        --env=*) APP_ENV_NAME="${1#*=}"; shift ;;
         --seed) FORCE_SEED=1; shift ;;
         --php) PHP_BIN="${2:-}"; shift 2 ;;
         --php=*) PHP_BIN="${1#*=}"; shift ;;
@@ -57,6 +61,11 @@ while [ $# -gt 0 ]; do
         *) fail "Unknown option: $1 (run: bash deploy.sh --help)" ;;
     esac
 done
+
+case "$APP_ENV_NAME" in
+    production|staging|local) ;;
+    *) fail "--env must be production or staging (got: $APP_ENV_NAME)" ;;
+esac
 
 # ---------------------------------------------------------------------------
 # 1. Find a suitable PHP binary
@@ -202,19 +211,19 @@ ok "Packages installed"
 step "Checking the .env file"
 if [ ! -f .env ]; then
     cp .env.example .env
-    sed -i 's/^APP_ENV=.*/APP_ENV=production/; s/^APP_DEBUG=.*/APP_DEBUG=false/' .env
+    sed -i "s/^APP_ENV=.*/APP_ENV=$APP_ENV_NAME/; s/^APP_DEBUG=.*/APP_DEBUG=false/" .env
     artisan key:generate --force >/dev/null
     trap - EXIT
     printf '\n%sA new .env file has been created with a fresh app key.%s\n' "$yellow" "$reset"
     cat <<EOF
 
 Open $APP_DIR/.env and fill in:
-  - APP_URL            (https://aminumagashigarbafoundation.org)
+  - APP_URL            ($( [ "$APP_ENV_NAME" = staging ] && echo 'https://staging.aminumagashigarbafoundation.org' || echo 'https://aminumagashigarbafoundation.org' ))
   - DB_CONNECTION, DB_HOST, DB_PORT, DB_DATABASE, DB_USERNAME, DB_PASSWORD
   - MAIL_MAILER=smtp and your mail server details (for form alerts)
   - ADMIN_EMAIL and a strong ADMIN_PASSWORD
 
-Then run this script again:  bash deploy.sh $( [ -n "$PUBLIC_HTML" ] && printf -- '--public-html %q' "$PUBLIC_HTML" )
+Then run this script again:  bash deploy.sh$( [ -n "$PUBLIC_HTML" ] && printf -- ' --public-html %q' "$PUBLIC_HTML" )
 EOF
     exit 0
 fi

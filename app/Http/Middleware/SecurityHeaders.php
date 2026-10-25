@@ -20,6 +20,11 @@ class SecurityHeaders
     {
         $response = $next($request);
 
+        // A staging or test copy must never show up in Google next to the real site.
+        if (! app()->isProduction()) {
+            $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
+        }
+
         // Files we send ourselves (downloads, uploads) set their own, stricter policy.
         if ($response->headers->has('Content-Security-Policy')) {
             return $response;

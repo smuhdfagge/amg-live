@@ -263,4 +263,13 @@ class XssProtectionTest extends TestCase
         $this->assertTrue(config('session.http_only'));
         $this->assertSame('lax', config('session.same_site'));
     }
+
+    public function test_staging_copies_are_hidden_from_search_engines(): void
+    {
+        $this->app['env'] = 'staging';
+        $this->get('/')->assertHeader('X-Robots-Tag', 'noindex, nofollow');
+
+        $this->app['env'] = 'production';
+        $this->get('/')->assertHeaderMissing('X-Robots-Tag');
+    }
 }
