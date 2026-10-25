@@ -28,7 +28,20 @@ Artisan::command('amg:seed-if-empty', function () {
 |   php artisan news:import https://aminumagashigarbafoundation.org
 |   php artisan news:import --file=/path/to/wordpress-export.xml
 */
-Artisan::command('news:import {site? : Address of the old WordPress website} {--file= : A WordPress export (.xml) file instead} {--update : Update stories imported before} {--no-photos : Skip copying photos}', function (\App\Support\WordPressImport $importer) {
+Artisan::command('news:import {site? : Address of the old WordPress website} {--file= : A WordPress export (.xml) file instead} {--uploads= : The old website wp-content/uploads folder, or a zip of it, so photos need no connection} {--update : Update stories imported before} {--no-photos : Skip copying photos}', function (\App\Support\WordPressImport $importer) {
+    if ($uploads = $this->option('uploads')) {
+        if (is_dir($uploads)) {
+            $importer->localUploads = $uploads;
+        } elseif (is_file($uploads)) {
+            $dir = storage_path('app/private/imports/cli-photos-'.\Illuminate\Support\Str::random(8));
+            $this->info('Unpacked '.\App\Support\WordPressImport::extractUploads($uploads, $dir).' photos from the zip.');
+            $importer->localUploads = $dir;
+        } else {
+            $this->error('Cannot find '.$uploads);
+
+            return 1;
+        }
+    }
     $update = (bool) $this->option('update');
     $photos = ! $this->option('no-photos');
     $counts = ['created' => 0, 'updated' => 0, 'skipped' => 0, 'failed' => 0];
@@ -68,6 +81,12 @@ Artisan::command('news:import {site? : Address of the old WordPress website} {--
         return 1;
     }
 
+    if (isset($dir)) {
+        \Illuminate\Support\Facades\File::deleteDirectory($dir);
+    }
+    if ($importer->deadHosts) {
+        $this->warn('Photos could not be copied from '.implode(', ', array_unique($importer->deadHosts)).' (no connection). Use --uploads.');
+    }
     $this->info("Done. {$counts['created']} added, {$counts['updated']} updated, {$counts['skipped']} skipped, {$counts['failed']} failed.");
 
     return 0;

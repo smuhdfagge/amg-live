@@ -6,6 +6,7 @@ use App\Models\Post;
 use App\Models\User;
 use App\Support\WordPressImport;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Request as HttpRequest;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;
@@ -201,5 +202,93 @@ class NewsImportTest extends TestCase
             ->expectsOutputToContain('2 added')
             ->assertExitCode(0);
         $this->assertNull(Post::firstWhere('legacy_id', 101)->cover_image);
+    }
+
+    private int $oldSiteAttempts = 0;
+
+    /** The old site cannot be reached; $internet says whether anything else can. */
+    private function fakeUnreachableOldSite(bool $internet): void
+    {
+        Http::fake(function (HttpRequest $request) use ($internet) {
+            $host = parse_url($request->url(), PHP_URL_HOST);
+            if (in_array($host, ['old.example.org', 'aminumagashigarbafoundation.org'], true) || ! $internet) {
+                $this->oldSiteAttempts++;
+                throw new ConnectionException('cURL error 28: Connection timed out after 10013 milliseconds');
+            }
+
+            return $host === 'api.ipify.org' ? Http::response('203.0.113.7') : Http::response('', 204);
+        });
+    }
+
+    public function test_explains_when_the_old_host_blocks_this_server(): void
+    {
+        $this->fakeUnreachableOldSite(internet: true);
+
+        $this->actingAs($this->admin())->from('/admin/news-import')
+            ->post('/admin/news-import', ['source' => 'site', 'site_url' => 'http://aminumagashigarbafoundation.org'])
+            ->assertSessionHasErrors(['site_url' => 'This server can reach the internet, but could not connect to aminumagashigarbafoundation.org. '
+                ."The old website's host (or a firewall or security plugin on it) is blocking this server, whose address is 203.0.113.7. "
+                .'Ask the old host to allow that address, then try again. Or use the export file option with a zip of the old photos, which needs no connection.']);
+    }
+
+    public function test_explains_when_this_server_cannot_get_out(): void
+    {
+        $this->fakeUnreachableOldSite(internet: false);
+
+        $this->actingAs($this->admin())->from('/admin/news-import')
+            ->post('/admin/news-import', ['source' => 'site', 'site_url' => 'aminumagashigarbafoundation.org'])
+            ->assertSessionHasErrors('site_url');
+        $this->assertStringContainsString('Your new hosting is blocking outgoing connections', session('errors')->first('site_url'));
+    }
+
+    public function test_export_file_with_a_photos_zip_needs_no_connection(): void
+    {
+        Storage::fake('public');
+        Storage::fake('local');
+        $this->fakeUnreachableOldSite(internet: false);
+
+        $zipPath = tempnam(sys_get_temp_dir(), 'up').'.zip';
+        $zip = new \ZipArchive;
+        $zip->open($zipPath, \ZipArchive::CREATE);
+        $zip->addFromString('uploads/2024/03/cover.jpg', $this->jpeg());
+        $zip->addFromString('uploads/2024/03/day.jpg', $this->jpeg());
+        $zip->addFromString('uploads/2024/03/notes.php', '<?php echo 1;');   // ignored
+        $zip->addFromString('../../evil.jpg', $this->jpeg());                  // ignored
+        $zip->close();
+
+        $admin = $this->admin();
+        $this->actingAs($admin)->post('/admin/news-import', [
+            'source' => 'file',
+            'file' => new UploadedFile(base_path('tests/fixtures/wordpress-export.xml'), 'export.xml', 'text/xml', null, true),
+            'photos_zip' => new UploadedFile($zipPath, 'uploads.zip', 'application/zip', null, true),
+            'photos' => '1',
+        ])->assertRedirect(route('admin.news-import.show'));
+        $this->actingAs($admin)->post('/admin/news-import/step');
+
+        $this->actingAs($admin)->get('/admin/news-import')->assertSee('2 stories added')->assertSee('Using 2 photos from your zip');
+        $post = Post::firstWhere('legacy_id', 101);
+        Storage::disk('public')->assertExists($post->cover_image);
+        $this->assertCount(1, $post->gallery);
+        $this->assertSame(0, $this->oldSiteAttempts, 'Photos came from the zip.');
+        $this->assertSame([], Storage::disk('local')->allFiles('imports'), 'Unpacked photos are removed afterwards.');
+        $this->assertFileDoesNotExist(dirname(Storage::disk('local')->path('x')).'/evil.jpg');
+    }
+
+    public function test_unreachable_photos_do_not_hold_up_the_import(): void
+    {
+        Storage::fake('public');
+        Storage::fake('local');
+        $this->fakeUnreachableOldSite(internet: true);
+        $admin = $this->admin();
+
+        $this->actingAs($admin)->post('/admin/news-import', [
+            'source' => 'file', 'photos' => '1',
+            'file' => new UploadedFile(base_path('tests/fixtures/wordpress-export.xml'), 'export.xml', 'text/xml', null, true),
+        ]);
+        $this->actingAs($admin)->post('/admin/news-import/step');
+
+        $this->assertSame(2, Post::count());
+        $this->assertSame(1, $this->oldSiteAttempts, 'Gives up on the old host after the first failed connection.');
+        $this->actingAs($admin)->get('/admin/news-import')->assertSee('Photos could not be copied from old.example.org');
     }
 }

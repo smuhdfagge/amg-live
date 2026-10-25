@@ -30,12 +30,15 @@ class NewsImportController extends Controller
             'source' => ['required', 'in:site,file'],
             'site_url' => ['required_if:source,site', 'nullable', 'string', 'max:255'],
             'file' => ['required_if:source,file', 'nullable', 'file', 'extensions:xml', 'max:102400'],
+            'photos_zip' => ['nullable', 'file', 'extensions:zip'],
             'update' => ['nullable', 'boolean'],
             'photos' => ['nullable', 'boolean'],
         ], [
             'site_url.required_if' => 'Enter the address of the old website.',
             'file.required_if' => 'Choose the export file you downloaded from WordPress.',
             'file.extensions' => 'Upload the .xml file that WordPress gives you under Tools, then Export.',
+            'photos_zip.extensions' => 'The photos must be a .zip file.',
+            'photos_zip.uploaded' => 'The photos zip is bigger than this server accepts. Zip one year of photos at a time, or ask for the command-line import.',
         ]);
 
         $job = [
@@ -60,6 +63,13 @@ class NewsImportController extends Controller
                 $path = $request->file('file')->storeAs('imports', 'wordpress-'.Str::random(12).'.xml', 'local');
                 $job['file'] = $path;
                 $job['total'] = count($importer->readExportFile(Storage::disk('local')->path($path)));
+
+                if ($request->hasFile('photos_zip')) {
+                    $zip = $request->file('photos_zip')->getRealPath();
+                    $dir = 'imports/photos-'.Str::random(12);
+                    $job['uploads_dir'] = $dir;
+                    $job['photos_found'] = WordPressImport::extractUploads($zip, Storage::disk('local')->path($dir));
+                }
             }
         } catch (RuntimeException $e) {
             $this->cleanUp($job);
@@ -87,6 +97,10 @@ class NewsImportController extends Controller
         }
 
         @set_time_limit(300);
+        $importer->deadHosts = $job['dead_hosts'] ?? [];
+        if (! empty($job['uploads_dir'])) {
+            $importer->localUploads = Storage::disk('local')->path($job['uploads_dir']);
+        }
 
         try {
             if ($job['source'] === 'site') {
@@ -120,6 +134,8 @@ class NewsImportController extends Controller
             }
         }
 
+        $job['dead_hosts'] = array_values(array_unique($importer->deadHosts));
+
         if ($finished) {
             $job['done'] = true;
             $this->cleanUp($job);
@@ -141,6 +157,9 @@ class NewsImportController extends Controller
     {
         if (! empty($job['file'])) {
             Storage::disk('local')->delete($job['file']);
+        }
+        if (! empty($job['uploads_dir'])) {
+            Storage::disk('local')->deleteDirectory($job['uploads_dir']);
         }
     }
 }

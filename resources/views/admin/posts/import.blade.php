@@ -28,6 +28,13 @@
             <div><dt>Problems</dt><dd>{{ $c['failed'] }}</dd></div>
         </dl>
 
+        @if (! empty($job['photos_found']))
+            <p class="muted small">Using {{ $job['photos_found'] }} photos from your zip.</p>
+        @endif
+        @if (! empty($job['dead_hosts']))
+            <div class="notice notice-info" role="status">Photos could not be copied from {{ implode(', ', $job['dead_hosts']) }} because this server cannot connect to it. The stories are still imported. Add the photos later by running the import again with <strong>Update stories</strong> ticked and a zip of the old photos.</div>
+        @endif
+
         @if ($job['errors'])
             <div class="notice notice-error" role="alert" style="display:block">
                 <strong>Some things did not work:</strong>
@@ -50,6 +57,7 @@
     </div>
 @else
     @if ($errors->any())<div class="notice notice-error" role="alert">{{ $errors->first() }}</div>@endif
+    @if (request('too_large'))<div class="notice notice-error" role="alert">The files were bigger than this server accepts ({{ \App\Http\Controllers\Admin\ResourceController::uploadLimits()['php'] }} MB), so nothing was imported. Zip one year of photos at a time and run the import once for each zip, with <strong>Update stories</strong> ticked after the first.</div>@endif
 
     <form method="POST" action="{{ route('admin.news-import.start') }}" enctype="multipart/form-data" class="panel" data-import-form>
         @csrf
@@ -63,12 +71,13 @@
             </label>
             <label class="choice-card">
                 <input type="radio" name="source" value="file" @checked(old('source') === 'file')>
-                <span><strong>A WordPress export file</strong><br><span class="muted small">Use this if the address option says the feed is switched off.</span></span>
+                <span><strong>A WordPress export file</strong><br><span class="muted small">Use this if the address option cannot connect. With a zip of the photos it needs no connection at all.</span></span>
             </label>
         </fieldset>
 
         <div data-show-for="site" style="margin-bottom:1rem">
             @include('partials.field', ['name' => 'site_url', 'label' => 'Old website address', 'value' => 'https://aminumagashigarbafoundation.org', 'required' => true])
+            @error('site_url')@else<p class="help">If this fails with a connection problem, the message tells you whether it is your new host or the old one. The export file option below works without any connection.</p>@enderror
         </div>
 
         <div data-show-for="file">
@@ -77,7 +86,14 @@
                 <input id="file" type="file" name="file" accept=".xml,text/xml,application/xml">
                 @error('file')<span class="error">{{ $message }}</span>@enderror
             </div>
-            <p class="help">To get the file: sign in to the old WordPress site, go to <strong>Tools</strong>, then <strong>Export</strong>, choose <strong>Posts</strong> and select <strong>Download Export File</strong>. Photos are still copied from the old website, so keep it online until the import is done.</p>
+            <p class="help">To get the file: sign in to the old WordPress site, go to <strong>Tools</strong>, then <strong>Export</strong>, choose <strong>Posts</strong> and select <strong>Download Export File</strong>.</p>
+
+            <div class="field @error('photos_zip') has-error @enderror" style="margin-top:1rem">
+                <label for="photos_zip">Old photos as a zip <span class="hint">(optional, but needed if this server cannot reach the old site)</span></label>
+                <input id="photos_zip" type="file" name="photos_zip" accept=".zip,application/zip">
+                @error('photos_zip')<span class="error">{{ $message }}</span>@enderror
+            </div>
+            <p class="help">To get the zip: in the old site's cPanel, open <strong>File Manager</strong>, go to <strong>public_html/wp-content</strong>, right-click the <strong>uploads</strong> folder and choose <strong>Compress</strong> (Zip), then download it. Without a zip, photos are copied from the old website if this server can reach it. This server accepts uploads up to {{ \App\Http\Controllers\Admin\ResourceController::uploadLimits()['php'] }} MB; if the zip is bigger, zip one year folder (for example uploads/2024) at a time.</p>
         </div>
 
         <div class="field"><label class="checkbox"><input type="checkbox" name="photos" value="1" @checked(old('photos', true))> Copy the photos too (featured image and photos inside each story)</label></div>

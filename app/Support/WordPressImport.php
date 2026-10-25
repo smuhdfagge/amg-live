@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use DOMDocument;
 use DOMElement;
 use DOMNode;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -29,6 +30,15 @@ class WordPressImport
     private const IMAGE_MAX_BYTES = 15 * 1024 * 1024;
 
     private const IMAGE_MAX_WIDTH = 1600;
+
+    /** Image extensions taken out of an uploads zip. */
+    private const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+    /** Hosts we could not connect to; photos from them are not tried again. */
+    public array $deadHosts = [];
+
+    /** Folder holding a copy of the old site's wp-content/uploads, if given. */
+    public ?string $localUploads = null;
 
     /* ------------------------------------------------------------------
      | Reading from the live site
@@ -63,10 +73,15 @@ class WordPressImport
         ];
 
         $lastError = null;
+        $connectionFailed = false;
         foreach ($attempts as $i => $endpoint) {
             $params = $i === 0 ? $query : ['rest_route' => '/wp/v2/posts'] + $query;
             try {
                 $response = $this->http()->get($endpoint, $params);
+            } catch (ConnectionException $e) {
+                $connectionFailed = true;
+
+                break;   // no point trying the second address on the same host
             } catch (\Throwable $e) {
                 $lastError = 'Could not reach '.$siteUrl.': '.$e->getMessage();
 
@@ -89,10 +104,52 @@ class WordPressImport
             $lastError = 'The site answered '.$response->status().'.';
         }
 
+        if ($connectionFailed) {
+            throw new RuntimeException($this->diagnose($siteUrl));
+        }
+
         throw new RuntimeException(
-            'Could not read the news from '.$siteUrl.'. '.$lastError
-            .' The site may have its feed switched off. Use the export file option instead.'
+            'The old website answered, but did not hand over its news. '.$lastError
+            .' Its WordPress feed is probably switched off. Use the export file option instead.'
         );
+    }
+
+    /**
+     * Explain a failed connection in plain words: is it this server that cannot
+     * get out, or the old website's host that is turning this server away?
+     */
+    public function diagnose(string $siteUrl): string
+    {
+        $canGetOut = false;
+        $ip = null;
+        foreach (['https://www.google.com/generate_204', 'https://www.cloudflare.com/cdn-cgi/trace'] as $probe) {
+            try {
+                if (Http::timeout(8)->connectTimeout(6)->get($probe)->status() < 500) {
+                    $canGetOut = true;
+                    break;
+                }
+            } catch (\Throwable) {
+            }
+        }
+        if ($canGetOut) {
+            try {
+                $ip = trim(Http::timeout(8)->connectTimeout(6)->get('https://api.ipify.org')->body()) ?: null;
+            } catch (\Throwable) {
+            }
+        }
+
+        $host = parse_url($siteUrl, PHP_URL_HOST);
+
+        if ($canGetOut) {
+            return 'This server can reach the internet, but could not connect to '.$host.'. '
+                .'The old website\'s host (or a firewall or security plugin on it) is blocking this server'
+                .($ip && filter_var($ip, FILTER_VALIDATE_IP) ? ', whose address is '.$ip.'. Ask the old host to allow that address, then try again' : '. Ask the old host to allow connections from your new server, then try again')
+                .'. Or use the export file option with a zip of the old photos, which needs no connection.';
+        }
+
+        return 'This server cannot connect to any outside website, so it cannot reach '.$host.'. '
+            .'Your new hosting is blocking outgoing connections. Ask your host to allow outgoing web (HTTP/HTTPS) connections, '
+            .'or use the export file option with a zip of the old photos, which needs no connection.';
     }
 
     private function fromRest(array $p): array
@@ -295,9 +352,28 @@ class WordPressImport
         // Prefer the original over a WordPress thumbnail such as photo-300x200.jpg
         $candidates = array_unique([preg_replace('/-\d{2,5}x\d{2,5}(?=\.\w{3,4}(\?|$))/', '', $url), $url]);
 
+        // A copy of the uploads folder, when given, saves going to the old site.
+        if ($this->localUploads) {
+            foreach ($candidates as $candidate) {
+                if (($local = $this->findLocal($candidate)) && ($stored = $this->storeImage(file_get_contents($local), $candidate))) {
+                    return $stored;
+                }
+            }
+        }
+
+        $host = strtolower((string) parse_url($url, PHP_URL_HOST));
+        if (in_array($host, $this->deadHosts, true)) {
+            return null;
+        }
+
         foreach ($candidates as $candidate) {
             try {
                 $response = $this->http()->get($candidate);
+            } catch (ConnectionException $e) {
+                $this->deadHosts[] = $host;   // do not wait on this host again
+                Log::info('News import: cannot connect to '.$host.' for photos');
+
+                return null;
             } catch (\Throwable $e) {
                 continue;
             }
@@ -314,6 +390,63 @@ class WordPressImport
         Log::info('News import: could not download image '.$url);
 
         return null;
+    }
+
+    /** Find a photo in the local copy of wp-content/uploads. */
+    private function findLocal(string $url): ?string
+    {
+        $path = rawurldecode((string) parse_url($url, PHP_URL_PATH));
+        $at = strpos($path, '/uploads/');
+        if ($at === false) {
+            return null;
+        }
+        $relative = substr($path, $at + strlen('/uploads/'));
+        if ($relative === '' || str_contains($relative, '..')) {
+            return null;
+        }
+        foreach (['', 'uploads/', 'wp-content/uploads/'] as $prefix) {
+            $file = rtrim($this->localUploads, '/').'/'.$prefix.$relative;
+            if (is_file($file)) {
+                return $file;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Unpack the photos from a zip of the old site's uploads folder.
+     * Only image files are taken, and nothing can be written outside $into.
+     */
+    public static function extractUploads(string $zipPath, string $into): int
+    {
+        $zip = new \ZipArchive;
+        if ($zip->open($zipPath) !== true) {
+            throw new RuntimeException('Could not open the zip of photos. Make sure it is a .zip file.');
+        }
+        @mkdir($into, 0775, true);
+        $count = 0;
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $name = str_replace('\\', '/', (string) $zip->getNameIndex($i));
+            $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+            if (str_ends_with($name, '/') || ! in_array($ext, self::IMAGE_EXTENSIONS, true)
+                || str_contains($name, '..') || str_starts_with($name, '/') || str_contains($name, '__MACOSX')) {
+                continue;
+            }
+            $target = $into.'/'.$name;
+            @mkdir(dirname($target), 0775, true);
+            $in = $zip->getStream($name);
+            if ($in) {
+                $out = fopen($target, 'wb');
+                stream_copy_to_stream($in, $out);
+                fclose($out);
+                fclose($in);
+                $count++;
+            }
+        }
+        $zip->close();
+
+        return $count;
     }
 
     private function storeImage(string $bytes, string $url): ?string
@@ -361,7 +494,9 @@ class WordPressImport
 
     private function http()
     {
-        return Http::timeout(30)->connectTimeout(10)->retry(2, 500, throw: false)
+        // Retry slow or failed answers, but not a host we cannot connect to at all.
+        return Http::timeout(30)->connectTimeout(10)
+            ->retry(2, 500, fn ($e) => ! $e instanceof ConnectionException, throw: false)
             ->withHeaders(['User-Agent' => 'AMG-Foundation-website-importer/1.0', 'Accept' => 'application/json, */*']);
     }
 

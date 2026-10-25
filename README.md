@@ -124,8 +124,10 @@ For a very large import you can use the command line instead:
 
 ```bash
 php artisan news:import https://aminumagashigarbafoundation.org
-php artisan news:import --file=/path/to/export.xml
+php artisan news:import --file=/path/to/export.xml --uploads=/path/to/uploads.zip
 ```
+
+If the new server cannot connect to the old site, the import screen says whether the new host is blocking outgoing connections or the old host is blocking the new server. Either way, the export file plus a zip of the old `wp-content/uploads` folder works without any connection.
 
 ## Radio programmes, jingles and videos
 
