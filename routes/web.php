@@ -7,6 +7,7 @@ use App\Http\Controllers\NewsController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ResourceController;
+use App\Http\Controllers\StorageFileController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -37,6 +38,9 @@ Route::middleware('throttle:forms')->group(function () {
 Route::redirect('/about-us', '/about', 301);
 Route::redirect('/projects', '/programmes', 301);
 Route::redirect('/sample-page', '/', 301);
+
+// Uploaded files, for hosts where the public/storage shortcut does not work.
+Route::get('/storage/{path}', StorageFileController::class)->where('path', '.*')->name('storage.file');
 
 Route::get('/sitemap.xml', [PageController::class, 'sitemap'])->name('sitemap');
 

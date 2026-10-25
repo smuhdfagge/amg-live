@@ -28,7 +28,7 @@
     <meta property="og:title" content="{{ $pageTitle }}">
     <meta property="og:description" content="{{ $pageDescription }}">
     <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:image" content="{{ $ogImage ?? asset('images/og-image.png') }}">
+    <meta property="og:image" content="{{ filled($ogImage ?? null) ? url($ogImage) : asset('images/og-image.png') }}">
     <meta property="og:locale" content="en_NG">
     <meta name="twitter:card" content="summary_large_image">
 

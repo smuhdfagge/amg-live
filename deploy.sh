@@ -262,11 +262,15 @@ fi
 # 9. Storage, permissions, caches
 # ---------------------------------------------------------------------------
 step "Linking public storage"
+if [ -L public/storage ] && [ ! -e public/storage ]; then
+    rm -f public/storage   # broken shortcut, recreate it below
+fi
 if [ -L public/storage ] || [ -d public/storage ]; then
     ok "public/storage already exists"
-else
-    artisan storage:link >/dev/null 2>&1 || ln -s "$APP_DIR/storage/app/public" "$APP_DIR/public/storage"
+elif artisan storage:link >/dev/null 2>&1 || ln -s "$APP_DIR/storage/app/public" "$APP_DIR/public/storage" 2>/dev/null; then
     ok "Linked public/storage"
+else
+    warn "Could not create public/storage. Uploaded images will still show, served by Laravel."
 fi
 
 step "Setting folder permissions"
@@ -304,8 +308,16 @@ if [ -n "$PUBLIC_HTML" ]; then
     grep -q "$APP_DIR/bootstrap/app.php" "$PUBLIC_HTML/index.php" \
         || fail "Could not rewrite $PUBLIC_HTML/index.php. Edit its paths by hand to point to $APP_DIR."
 
-    if [ ! -e "$PUBLIC_HTML/storage" ]; then
-        ln -s "$APP_DIR/storage/app/public" "$PUBLIC_HTML/storage"
+    # Shortcut to uploaded files. If it is missing or the host blocks it, the
+    # site still serves uploads through Laravel, just a little more slowly.
+    TARGET="$APP_DIR/storage/app/public"
+    if [ -L "$PUBLIC_HTML/storage" ] && [ "$(readlink "$PUBLIC_HTML/storage")" != "$TARGET" ]; then
+        rm -f "$PUBLIC_HTML/storage"   # old or broken shortcut
+    fi
+    if [ -d "$PUBLIC_HTML/storage" ] && [ ! -L "$PUBLIC_HTML/storage" ]; then
+        warn "$PUBLIC_HTML/storage is a normal folder, not a shortcut. Uploads still work, but you can delete that folder and run this script again for faster images."
+    elif [ ! -e "$PUBLIC_HTML/storage" ]; then
+        ln -s "$TARGET" "$PUBLIC_HTML/storage" 2>/dev/null || warn "Could not create the storage shortcut. Uploads will still show."
     fi
 
     ok "public_html now serves the site"

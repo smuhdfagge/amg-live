@@ -33,7 +33,9 @@ return [
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app/private'),
-            'serve' => true,
+            // Off: when on, Laravel claims /storage/... for private files and
+            // answers 403 for public uploads on hosts without the storage link.
+            'serve' => false,
             'throw' => false,
             'report' => false,
         ],
@@ -41,7 +43,9 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage',
+            // Relative, so uploaded images work whatever APP_URL says and on
+            // both http and https. Pages that need a full address use url().
+            'url' => '/storage',
             'visibility' => 'public',
             'throw' => false,
             'report' => false,
