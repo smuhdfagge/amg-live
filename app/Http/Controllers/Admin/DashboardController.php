@@ -13,7 +13,7 @@ use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    public function __invoke(): View
+    public function __invoke(\Illuminate\Http\Request $request): View
     {
         return view('admin.dashboard', [
             'counts' => [
@@ -24,8 +24,9 @@ class DashboardController extends Controller
                 'projects' => Project::count(),
                 'resources' => Resource::count(),
             ],
-            'messages' => ContactMessage::latest()->take(5)->get(),
-            'volunteers' => VolunteerApplication::latest()->take(5)->get(),
+            // Editors do not see personal data.
+            'messages' => $request->user()->isAdmin() ? ContactMessage::latest()->take(5)->get() : collect(),
+            'volunteers' => $request->user()->isAdmin() ? VolunteerApplication::latest()->take(5)->get() : collect(),
         ]);
     }
 }

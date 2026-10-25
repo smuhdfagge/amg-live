@@ -42,6 +42,7 @@ $paths = [
     'radio' => '<rect x="3.5" y="8" width="17" height="12" rx="2"/><path d="m7 8 9-4.5"/><circle cx="15.5" cy="14" r="2.6"/><path d="M7 12.5h3M7 15.5h3"/>',
     'music' => '<path d="M9 18V5.5l10.5-2V16"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17" cy="16" r="2.5"/><path d="M9 9.5l10.5-2"/>',
     'video' => '<rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10.5 5-3v9l-5-3z"/>',
+    'shield' => '<path d="M12 3 4.5 6v5.5c0 4.6 3.2 8 7.5 9.5 4.3-1.5 7.5-4.9 7.5-9.5V6z"/><circle cx="12" cy="10.5" r="2.3"/><path d="M8.3 16.2c.8-1.7 2.1-2.5 3.7-2.5s2.9.8 3.7 2.5"/>',
     'play' => '<path d="M8 5.5v13l10.5-6.5z"/>',
     // Social
     'facebook' => '<path d="M14 8.5h2.5V5H14a3.5 3.5 0 0 0-3.5 3.5V11H8v3.5h2.5V21H14v-6.5h2.5L17 11h-3V9a.5.5 0 0 1 .5-.5z"/>',

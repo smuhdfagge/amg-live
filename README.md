@@ -142,6 +142,27 @@ Long videos are best put on YouTube, because they take a lot of hosting space an
 
 Upload limits are 50 MB for audio and 200 MB for video (`AMG_MAX_AUDIO_MB`, `AMG_MAX_VIDEO_MB` in `.env`). The server's PHP settings must allow that too. `public/.user.ini` raises them to 256 MB on most cPanel hosting. If the admin form still shows a lower limit, raise `upload_max_filesize` and `post_max_size` in cPanel's **MultiPHP INI Editor**, or ask your host.
 
+## Users and roles
+
+Administrators manage accounts under **Users** in the admin. There are two roles:
+
+- **Administrator:** everything, including messages, volunteers, subscribers and user accounts.
+- **Editor:** news, programmes and resources only.
+
+Switching an account off, or setting a new password for someone, signs them out straight away. Nobody can remove their own administrator access or delete themselves, and the last active administrator cannot be removed. Accounts that existed before roles were added stay administrators.
+
+## Security against cross-site scripting (XSS)
+
+- Every piece of text from forms, the admin and imports is escaped when shown, so `<script>` appears as text and never runs.
+- Links typed in the admin must start with `http://` or `https://`. `javascript:` and similar links are refused, and are never output even if one reaches the database.
+- Every page sends a Content Security Policy that only allows the site's own JavaScript file. The site has no inline scripts, so an injected script or `onclick` would be blocked by the browser even if it got onto a page.
+- Uploaded audio and video are checked inside, not only by name: a web page or script renamed to `.mp3` is refused. Uploaded files are served with their type set from the extension, in a sandbox, and `storage/app/public/.htaccess` stops Apache running or displaying scripts from the uploads folder.
+- Data for search engines in the page head is encoded so it cannot close its own `<script>` tag.
+- CSV downloads guard against spreadsheet formulas typed into the public forms.
+- The session cookie cannot be read by JavaScript, and is sent over https only when the site runs on https.
+
+`tests/Feature/XssProtectionTest.php` sends script payloads through every form and checks every page that shows them. Run `php artisan test` after any change to the templates.
+
 ## Editing content
 
 - **News and programmes:** use the admin area.

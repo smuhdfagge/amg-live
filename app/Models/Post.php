@@ -32,12 +32,12 @@ class Post extends Model
 
     public function isExternal(): bool
     {
-        return filled($this->external_url) && blank($this->body);
+        return \App\Support\SafeUrl::web($this->external_url) !== null && blank($this->body);
     }
 
     public function url(): string
     {
-        return $this->isExternal() ? $this->external_url : route('news.show', $this);
+        return $this->isExternal() ? \App\Support\SafeUrl::web($this->external_url) : route('news.show', $this);
     }
 
     public function coverUrl(): ?string

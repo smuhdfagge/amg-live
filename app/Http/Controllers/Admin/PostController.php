@@ -62,7 +62,7 @@ class PostController extends Controller
             'category' => ['required', Rule::in(Post::CATEGORIES)],
             'excerpt' => ['nullable', 'string', 'max:500'],
             'body' => ['nullable', 'required_without:external_url', 'string'],
-            'external_url' => ['nullable', 'url', 'max:500'],
+            'external_url' => ['nullable', 'max:500', ...\App\Support\SafeUrl::rule()],
             'source' => ['nullable', 'string', 'max:120'],
             'published_at' => ['nullable', 'date'],
             'cover' => ['nullable', 'image', 'max:4096'],

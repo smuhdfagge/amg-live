@@ -37,7 +37,7 @@ class VolunteerController extends Controller
             $out = fopen('php://output', 'w');
             fputcsv($out, ['Date', 'Name', 'Email', 'Phone', 'Location', 'Interest', 'Availability', 'Skills', 'Message']);
             VolunteerApplication::latest()->each(function ($v) use ($out) {
-                fputcsv($out, [
+                \App\Support\Csv::row($out, [
                     $v->created_at->format('Y-m-d'), $v->name, $v->email, $v->phone, $v->location,
                     VolunteerApplication::INTERESTS[$v->interest] ?? $v->interest,
                     VolunteerApplication::AVAILABILITY[$v->availability] ?? $v->availability,

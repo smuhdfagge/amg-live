@@ -51,7 +51,7 @@ Route::get('/admin/login', [LoginController::class, 'show'])->name('login')->mid
 Route::post('/admin/login', [LoginController::class, 'login'])->middleware(['guest', 'throttle:login'])->name('login.attempt');
 Route::post('/admin/logout', [LoginController::class, 'logout'])->middleware('auth')->name('logout');
 
-Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'account.active'])->group(function () {
     Route::get('/', Admin\DashboardController::class)->name('dashboard');
     Route::get('news-import', [Admin\NewsImportController::class, 'show'])->name('news-import.show');
     Route::post('news-import', [Admin\NewsImportController::class, 'start'])->name('news-import.start');
@@ -60,16 +60,20 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::resource('posts', Admin\PostController::class)->except('show');
     Route::resource('projects', Admin\ProjectController::class)->except('show');
     Route::resource('resources', Admin\ResourceController::class)->except('show');
-    Route::get('messages', [Admin\MessageController::class, 'index'])->name('messages.index');
-    Route::get('messages/{message}', [Admin\MessageController::class, 'show'])->name('messages.show');
-    Route::delete('messages/{message}', [Admin\MessageController::class, 'destroy'])->name('messages.destroy');
-    Route::get('volunteers', [Admin\VolunteerController::class, 'index'])->name('volunteers.index');
-    Route::get('volunteers/export', [Admin\VolunteerController::class, 'export'])->name('volunteers.export');
-    Route::get('volunteers/{volunteer}', [Admin\VolunteerController::class, 'show'])->name('volunteers.show');
-    Route::delete('volunteers/{volunteer}', [Admin\VolunteerController::class, 'destroy'])->name('volunteers.destroy');
-    Route::get('subscribers', [Admin\SubscriberController::class, 'index'])->name('subscribers.index');
-    Route::get('subscribers/export', [Admin\SubscriberController::class, 'export'])->name('subscribers.export');
-    Route::delete('subscribers/{subscriber}', [Admin\SubscriberController::class, 'destroy'])->name('subscribers.destroy');
+    // Personal data and user accounts: administrators only.
+    Route::middleware('admin.only')->group(function () {
+        Route::get('messages', [Admin\MessageController::class, 'index'])->name('messages.index');
+        Route::get('messages/{message}', [Admin\MessageController::class, 'show'])->name('messages.show');
+        Route::delete('messages/{message}', [Admin\MessageController::class, 'destroy'])->name('messages.destroy');
+        Route::get('volunteers', [Admin\VolunteerController::class, 'index'])->name('volunteers.index');
+        Route::get('volunteers/export', [Admin\VolunteerController::class, 'export'])->name('volunteers.export');
+        Route::get('volunteers/{volunteer}', [Admin\VolunteerController::class, 'show'])->name('volunteers.show');
+        Route::delete('volunteers/{volunteer}', [Admin\VolunteerController::class, 'destroy'])->name('volunteers.destroy');
+        Route::get('subscribers', [Admin\SubscriberController::class, 'index'])->name('subscribers.index');
+        Route::get('subscribers/export', [Admin\SubscriberController::class, 'export'])->name('subscribers.export');
+        Route::delete('subscribers/{subscriber}', [Admin\SubscriberController::class, 'destroy'])->name('subscribers.destroy');
+        Route::resource('users', Admin\UserController::class)->except('show');
+    });
     Route::get('account', [Admin\AccountController::class, 'edit'])->name('account');
     Route::put('account', [Admin\AccountController::class, 'update'])->name('account.update');
 });

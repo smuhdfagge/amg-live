@@ -14,7 +14,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->alias([
+            'admin.only' => \App\Http\Middleware\EnsureAdministrator::class,
+            'account.active' => \App\Http\Middleware\EnsureAccountActive::class,
+        ]);
+        $middleware->web(append: [\App\Http\Middleware\SecurityHeaders::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // An upload bigger than the server's post_max_size arrives with no data at

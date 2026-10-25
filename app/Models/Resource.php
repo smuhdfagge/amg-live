@@ -72,7 +72,7 @@ class Resource extends Model
 
     public function youtubeId(): ?string
     {
-        if (blank($this->media_url)) {
+        if (\App\Support\SafeUrl::web($this->media_url) === null) {
             return null;
         }
         $pattern = '~(?:youtube\.com/(?:watch\?(?:.*&)?v=|embed/|shorts/|live/)|youtu\.be/)([A-Za-z0-9_-]{11})~';
@@ -82,7 +82,7 @@ class Resource extends Model
 
     public function vimeoId(): ?string
     {
-        return filled($this->media_url) && preg_match('~vimeo\.com/(?:video/)?(\d+)~', $this->media_url, $m) ? $m[1] : null;
+        return \App\Support\SafeUrl::web($this->media_url) && preg_match('~vimeo\.com/(?:video/)?(\d+)~', $this->media_url, $m) ? $m[1] : null;
     }
 
     /** Address for an <iframe> player, when the link is YouTube or Vimeo. */
@@ -104,6 +104,9 @@ class Resource extends Model
         if ($url = $this->fileUrl()) {
             return $url;
         }
+        if (\App\Support\SafeUrl::web($this->media_url) === null) {
+            return null;
+        }
         $path = strtolower((string) parse_url((string) $this->media_url, PHP_URL_PATH));
         $ext = pathinfo($path, PATHINFO_EXTENSION);
         $allowed = $this->isVideo() ? self::VIDEO_EXTENSIONS : self::AUDIO_EXTENSIONS;
@@ -114,7 +117,9 @@ class Resource extends Model
     /** A link to listen or watch elsewhere, when we cannot play it on the page. */
     public function externalUrl(): ?string
     {
-        return filled($this->media_url) && ! $this->embedUrl() && ! $this->playableUrl() ? $this->media_url : null;
+        $url = \App\Support\SafeUrl::web($this->media_url);
+
+        return $url && ! $this->embedUrl() && ! $this->playableUrl() ? $url : null;
     }
 
     public function anchor(): string

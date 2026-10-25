@@ -58,7 +58,7 @@
             'addressRegion' => 'Kano State',
             'addressCountry' => 'NG',
         ],
-    ]), JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
+    ]), JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!}
     </script>
     @stack('head')
 </head>
@@ -133,7 +133,7 @@
                     @if (filled($org['registration']['tin']))FIRS TIN: {{ $org['registration']['tin'] }}@endif
                 </p>
             @endif
-            @php $socials = array_filter($org['social']); @endphp
+            @php $socials = array_filter(array_map([\App\Support\SafeUrl::class, 'web'], $org['social'])); @endphp
             @if ($socials)
                 <div class="social">
                     @foreach ($socials as $network => $link)

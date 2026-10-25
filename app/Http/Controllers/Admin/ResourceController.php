@@ -74,6 +74,26 @@ class ResourceController extends Controller
         ];
     }
 
+    /**
+     * Look inside the file, not just at its name: a web page or script saved as
+     * "song.mp3" is refused, so it can never be served from this site.
+     */
+    public static function notAWebPage(): \Closure
+    {
+        return function (string $attribute, mixed $file, \Closure $fail) {
+            if (! $file instanceof \Illuminate\Http\UploadedFile || ! $file->isValid()) {
+                return;
+            }
+            $mime = strtolower((string) (new \finfo(FILEINFO_MIME_TYPE))->file($file->getRealPath()));
+            $head = strtolower((string) file_get_contents($file->getRealPath(), false, null, 0, 1024));
+            $looksLikePage = str_starts_with($mime, 'text/') || preg_match('/html|xml|javascript|ecmascript|php|svg|x-sh/', $mime)
+                || preg_match('/<\s*(script|html|body|svg|iframe|\?php)\b/', $head);
+            if ($looksLikePage) {
+                $fail('This file is not a real audio or video file. Choose the original recording.');
+            }
+        };
+    }
+
     private static function iniBytes(string|false $value): int
     {
         $value = trim((string) $value);
@@ -103,8 +123,8 @@ class ResourceController extends Controller
             'description' => ['nullable', 'string', 'max:2000'],
             'language' => ['nullable', Rule::in(Resource::LANGUAGES)],
             'duration' => ['nullable', 'string', 'max:20'],
-            'media_url' => ['nullable', 'url', 'max:500'],
-            'media' => ['nullable', 'file', 'extensions:'.implode(',', $exts), 'max:'.($limitMb * 1024)],
+            'media_url' => ['nullable', 'max:500', ...\App\Support\SafeUrl::rule()],
+            'media' => ['nullable', 'file', 'extensions:'.implode(',', $exts), 'max:'.($limitMb * 1024), self::notAWebPage()],
             'remove_media' => ['nullable', 'boolean'],
             'thumb' => ['nullable', 'image', 'max:4096'],
             'remove_thumb' => ['nullable', 'boolean'],

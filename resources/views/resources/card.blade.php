@@ -46,7 +46,7 @@
                     <a href="{{ $play }}">Listen</a>
                 </audio>
             @elseif ($embed)
-                <a class="text-link" href="{{ $resource->media_url }}" target="_blank" rel="noopener">Listen<span class="sr-only"> (opens in a new tab)</span></a>
+                <a class="text-link" href="{{ \App\Support\SafeUrl::web($resource->media_url) }}" target="_blank" rel="noopener">Listen<span class="sr-only"> (opens in a new tab)</span></a>
             @endif
         @endunless
 

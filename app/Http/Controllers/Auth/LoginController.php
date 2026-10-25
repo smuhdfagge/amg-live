@@ -22,11 +22,14 @@ class LoginController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        if (! Auth::attempt($credentials, $request->boolean('remember'))) {
+        // Switched-off accounts cannot sign in. The message is the same as for a
+        // wrong password, so it does not reveal which emails have accounts.
+        if (! Auth::attempt($credentials + ['is_active' => true], $request->boolean('remember'))) {
             return back()->withErrors(['email' => 'The email or password is not correct.'])->onlyInput('email');
         }
 
         $request->session()->regenerate();
+        $request->user()->forceFill(['last_login_at' => now()])->saveQuietly();
 
         return redirect()->intended(route('admin.dashboard'));
     }

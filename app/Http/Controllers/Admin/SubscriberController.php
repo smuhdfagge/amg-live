@@ -27,7 +27,7 @@ class SubscriberController extends Controller
         return response()->streamDownload(function () {
             $out = fopen('php://output', 'w');
             fputcsv($out, ['Email', 'Subscribed on']);
-            Subscriber::oldest()->each(fn ($s) => fputcsv($out, [$s->email, $s->created_at->format('Y-m-d')]));
+            Subscriber::oldest()->each(fn ($s) => \App\Support\Csv::row($out, [$s->email, $s->created_at->format('Y-m-d')]));
             fclose($out);
         }, 'amg-subscribers-'.now()->format('Y-m-d').'.csv', ['Content-Type' => 'text/csv']);
     }

@@ -1,16 +1,19 @@
 @php
-    $unread = \App\Models\ContactMessage::whereNull('read_at')->count();
-    $newVol = \App\Models\VolunteerApplication::whereNull('read_at')->count();
-    $items = [
+    $me = auth()->user();
+    $isAdmin = $me?->isAdmin();
+    $unread = $isAdmin ? \App\Models\ContactMessage::whereNull('read_at')->count() : 0;
+    $newVol = $isAdmin ? \App\Models\VolunteerApplication::whereNull('read_at')->count() : 0;
+    $items = array_filter([
         ['admin.dashboard', 'admin.dashboard', 'home', 'Dashboard', null],
-        ['admin.posts.index', 'admin.posts.*', 'news', 'News', null],
+        ['admin.posts.index', ['admin.posts.*', 'admin.news-import.*'], 'news', 'News', null],
         ['admin.projects.index', 'admin.projects.*', 'folder', 'Programmes', null],
         ['admin.resources.index', 'admin.resources.*', 'radio', 'Resources', null],
-        ['admin.messages.index', 'admin.messages.*', 'inbox', 'Messages', $unread],
-        ['admin.volunteers.index', 'admin.volunteers.*', 'hand', 'Volunteers', $newVol],
-        ['admin.subscribers.index', 'admin.subscribers.*', 'users', 'Subscribers', null],
+        $isAdmin ? ['admin.messages.index', 'admin.messages.*', 'inbox', 'Messages', $unread] : null,
+        $isAdmin ? ['admin.volunteers.index', 'admin.volunteers.*', 'hand', 'Volunteers', $newVol] : null,
+        $isAdmin ? ['admin.subscribers.index', 'admin.subscribers.*', 'users', 'Subscribers', null] : null,
+        $isAdmin ? ['admin.users.index', 'admin.users.*', 'shield', 'Users', null] : null,
         ['admin.account', 'admin.account*', 'settings', 'My account', null],
-    ];
+    ]);
 @endphp
 <!DOCTYPE html>
 <html lang="en-NG">

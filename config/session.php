@@ -169,7 +169,8 @@ return [
     |
     */
 
-    'secure' => env('SESSION_SECURE_COOKIE'),
+    // Send the session cookie over https only whenever the site runs on https.
+    'secure' => env('SESSION_SECURE_COOKIE', str_starts_with((string) env('APP_URL'), 'https://') ? true : null),
 
     /*
     |--------------------------------------------------------------------------

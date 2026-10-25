@@ -25,8 +25,8 @@
                         @endforeach
                     </div>
                 @endif
-                @if ($post->external_url)
-                    <p><a class="text-link" href="{{ $post->external_url }}" target="_blank" rel="noopener">Read the original{{ $post->source ? ' on '.$post->source : '' }} <x-icon name="external" :size="16" /></a></p>
+                @if (\App\Support\SafeUrl::web($post->external_url))
+                    <p><a class="text-link" href="{{ \App\Support\SafeUrl::web($post->external_url) }}" target="_blank" rel="noopener">Read the original{{ $post->source ? ' on '.$post->source : '' }} <x-icon name="external" :size="16" /></a></p>
                 @endif
             </div>
         </article>
