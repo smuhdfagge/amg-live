@@ -6,6 +6,7 @@ use App\Http\Controllers\FormController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ResourceController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,6 +19,7 @@ Route::get('/our-work/{area}', [PageController::class, 'area'])->name('work.area
 Route::get('/programmes', [ProjectController::class, 'index'])->name('projects.index');
 Route::get('/programmes/{project}', [ProjectController::class, 'show'])->name('projects.show');
 Route::get('/partners', [PageController::class, 'partners'])->name('partners');
+Route::get('/resources', [ResourceController::class, 'index'])->name('resources.index');
 Route::get('/news', [NewsController::class, 'index'])->name('news.index');
 Route::get('/news/{post}', [NewsController::class, 'show'])->name('news.show');
 Route::get('/get-involved', [PageController::class, 'involved'])->name('involved');
@@ -49,6 +51,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('/', Admin\DashboardController::class)->name('dashboard');
     Route::resource('posts', Admin\PostController::class)->except('show');
     Route::resource('projects', Admin\ProjectController::class)->except('show');
+    Route::resource('resources', Admin\ResourceController::class)->except('show');
     Route::get('messages', [Admin\MessageController::class, 'index'])->name('messages.index');
     Route::get('messages/{message}', [Admin\MessageController::class, 'show'])->name('messages.show');
     Route::delete('messages/{message}', [Admin\MessageController::class, 'destroy'])->name('messages.destroy');

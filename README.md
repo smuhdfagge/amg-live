@@ -11,6 +11,7 @@ The website of the Aminu Magashi Garba Foundation (AMG Foundation), a non-profit
 - Our work: ten focus areas, each with its own page, plus how the Foundation works
 - Programmes: added through the admin area, each with its own page
 - Partners: who the Foundation works with, plus a list built from the programmes
+- Resources: radio programmes, audio jingles and videos, with players on the page, filters by type and optional downloads
 - News, with support for stories written on the site and links to press coverage
 - Get involved, with a volunteer application form
 - Support our work, with ways to give (bank details appear once you add them)
@@ -24,6 +25,7 @@ Sections with nothing to show yet (programmes, news, phone, email, registration 
 - Dashboard with unread messages and new volunteer applications
 - Add, edit and delete news (with photos, drafts and scheduled publishing)
 - Add, edit and reorder programmes (with photos and a "feature on home page" switch)
+- Add radio programmes, jingles and videos: upload the file, or paste a YouTube, Vimeo, SoundCloud or other link
 - Read and reply to contact messages
 - Review volunteer applications and download them as CSV
 - View and export newsletter subscribers
@@ -111,6 +113,19 @@ If your host runs the build for you, set its PHP version to 8.3 or 8.4 and use:
 `composer.json` pins the platform to PHP 8.3 (`config.platform.php`), so `composer update` always produces a lock file that installs on PHP 8.3, 8.4 and 8.5, whatever PHP version you run it on. Do not remove that setting. Without it, a lock built on PHP 8.4 pulls in Symfony 8 packages that need PHP 8.4.1+, and the server fails with "Your lock file does not contain a compatible set of packages".
 
 If you ever see that error, check which PHP Composer is really using with `php -v` (on cPanel the command-line PHP is often older than the website's PHP). The deploy script finds the right one for you.
+
+## Radio programmes, jingles and videos
+
+Add them under **Resources** in the admin. Each one is either an uploaded file or a link:
+
+- **Uploaded audio** (MP3, M4A, WAV, OGG) plays on the page, and can be downloaded if you tick the box.
+- **Uploaded video** (MP4, WEBM, MOV) plays on the page too.
+- **YouTube or Vimeo links** play on the page. YouTube videos use their own picture as the cover.
+- **Any other link** (SoundCloud, Facebook, a radio station) shows a Listen or Watch button.
+
+Long videos are best put on YouTube, because they take a lot of hosting space and most shared hosting limits upload size.
+
+Upload limits are 50 MB for audio and 200 MB for video (`AMG_MAX_AUDIO_MB`, `AMG_MAX_VIDEO_MB` in `.env`). The server's PHP settings must allow that too. `public/.user.ini` raises them to 256 MB on most cPanel hosting. If the admin form still shows a lower limit, raise `upload_max_filesize` and `post_max_size` in cPanel's **MultiPHP INI Editor**, or ask your host.
 
 ## Editing content
 

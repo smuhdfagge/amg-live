@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ContactMessage;
 use App\Models\Post;
 use App\Models\Project;
+use App\Models\Resource;
 use App\Models\Subscriber;
 use App\Models\VolunteerApplication;
 use Illuminate\View\View;
@@ -21,6 +22,7 @@ class DashboardController extends Controller
                 'subscribers' => Subscriber::count(),
                 'posts' => Post::count(),
                 'projects' => Project::count(),
+                'resources' => Resource::count(),
             ],
             'messages' => ContactMessage::latest()->take(5)->get(),
             'volunteers' => VolunteerApplication::latest()->take(5)->get(),

@@ -30,3 +30,37 @@
   var s = document.querySelector('.admin-side');
   if (t && s) t.addEventListener('click', function () { s.classList.toggle('is-open'); });
 })();
+// Resources: load a YouTube or Vimeo player only when the visitor presses play,
+// and pause any other player that is already playing.
+(function () {
+  document.querySelectorAll('[data-play-embed]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var frame = btn.closest('[data-embed]');
+      var src = frame.getAttribute('data-embed');
+      var iframe = document.createElement('iframe');
+      iframe.src = src + (src.indexOf('?') > -1 ? '&' : '?') + 'autoplay=1';
+      iframe.title = btn.getAttribute('aria-label') || 'Video';
+      iframe.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+      iframe.allowFullscreen = true;
+      frame.replaceChildren(iframe);
+      iframe.focus();
+    });
+  });
+  document.addEventListener('play', function (e) {
+    document.querySelectorAll('audio, video').forEach(function (m) { if (m !== e.target) m.pause(); });
+  }, true);
+})();
+// Admin resource form: match the file picker and hint to the chosen type.
+(function () {
+  var form = document.querySelector('[data-resource-form]');
+  if (!form) return;
+  var type = form.querySelector('select[name="type"]');
+  var input = form.querySelector('[data-media-input]');
+  var hint = form.querySelector('[data-media-hint]');
+  function sync() {
+    var video = type.value === 'video';
+    input.setAttribute('accept', video ? 'video/*' : 'audio/*');
+    hint.textContent = hint.getAttribute(video ? 'data-video' : 'data-audio');
+  }
+  type.addEventListener('change', sync);
+})();

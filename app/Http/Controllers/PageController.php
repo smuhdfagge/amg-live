@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use App\Models\Project;
+use App\Models\Resource;
 use Illuminate\Http\Response;
 use Illuminate\View\View;
 
@@ -14,6 +15,7 @@ class PageController extends Controller
         return view('pages.home', [
             'featured' => Project::where('is_featured', true)->ordered()->take(3)->get(),
             'posts' => Post::published()->take(3)->get(),
+            'resources' => Resource::published()->take(3)->get(),
             'areas' => collect(config('amg.thematic_areas')),
         ]);
     }
@@ -81,7 +83,7 @@ class PageController extends Controller
     {
         $urls = collect([
             route('home'), route('about'), route('work'), route('projects.index'), route('partners'),
-            route('news.index'), route('involved'), route('support'), route('contact'),
+            route('resources.index'), route('news.index'), route('involved'), route('support'), route('contact'),
         ])
             ->merge(collect(config('amg.thematic_areas'))->map(fn ($a) => route('work.area', $a['slug'])))
             ->merge(Project::pluck('slug')->map(fn ($s) => route('projects.show', $s)))

@@ -39,6 +39,10 @@ $paths = [
     'trash' => '<path d="M4.5 7h15"/><path d="M9.5 7V4.5h5V7"/><path d="M6.5 7l1 13h9l1-13"/>',
     'edit' => '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>',
     'eye' => '<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/>',
+    'radio' => '<rect x="3.5" y="8" width="17" height="12" rx="2"/><path d="m7 8 9-4.5"/><circle cx="15.5" cy="14" r="2.6"/><path d="M7 12.5h3M7 15.5h3"/>',
+    'music' => '<path d="M9 18V5.5l10.5-2V16"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17" cy="16" r="2.5"/><path d="M9 9.5l10.5-2"/>',
+    'video' => '<rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10.5 5-3v9l-5-3z"/>',
+    'play' => '<path d="M8 5.5v13l10.5-6.5z"/>',
     // Social
     'facebook' => '<path d="M14 8.5h2.5V5H14a3.5 3.5 0 0 0-3.5 3.5V11H8v3.5h2.5V21H14v-6.5h2.5L17 11h-3V9a.5.5 0 0 1 .5-.5z"/>',
     'x' => '<path d="M4.5 4.5h4l11 15h-4z"/><path d="m19.5 4.5-6.2 6.8M10.7 13.2l-6.2 6.3"/>',

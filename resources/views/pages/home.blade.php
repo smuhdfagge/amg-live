@@ -131,6 +131,25 @@
     </div>
 </section>
 
+@if ($resources->isNotEmpty())
+<section @class(['section', 'section-mist' => $featured->isEmpty()])>
+    <div class="wrap">
+        <div class="section-head">
+            <div>
+                <h2>Listen and watch</h2>
+                <p>Our latest radio programmes, jingles and videos.</p>
+            </div>
+            <a class="text-link" href="{{ route('resources.index') }}">All resources</a>
+        </div>
+        <div class="resource-grid">
+            @foreach ($resources as $resource)
+                @include('resources.card', ['resource' => $resource])
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
+
 @if ($posts->isNotEmpty())
 <section class="section">
     <div class="wrap">

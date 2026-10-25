@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="admin-top"><h1>Welcome, {{ auth()->user()->name }}</h1>
-    <div class="btn-row"><a class="btn btn-red btn-sm" href="{{ route('admin.posts.create') }}"><x-icon name="plus" :size="18" /> Add news</a></div>
+    <div class="btn-row"><a class="btn btn-red btn-sm" href="{{ route('admin.posts.create') }}"><x-icon name="plus" :size="18" /> Add news</a><a class="btn btn-outline btn-sm" href="{{ route('admin.resources.create') }}"><x-icon name="plus" :size="18" /> Add resource</a></div>
 </div>
 <div class="stats">
     <a class="stat" href="{{ route('admin.messages.index') }}"><strong>{{ $counts['unreadMessages'] }}</strong><span>unread messages</span></a>
@@ -10,6 +10,7 @@
     <a class="stat" href="{{ route('admin.subscribers.index') }}"><strong>{{ $counts['subscribers'] }}</strong><span>subscribers</span></a>
     <a class="stat" href="{{ route('admin.posts.index') }}"><strong>{{ $counts['posts'] }}</strong><span>news posts</span></a>
     <a class="stat" href="{{ route('admin.projects.index') }}"><strong>{{ $counts['projects'] }}</strong><span>programmes</span></a>
+    <a class="stat" href="{{ route('admin.resources.index') }}"><strong>{{ $counts['resources'] }}</strong><span>resources</span></a>
 </div>
 <div class="split">
     <div class="panel">

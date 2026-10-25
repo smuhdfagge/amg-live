@@ -5,6 +5,7 @@
         ['admin.dashboard', 'admin.dashboard', 'home', 'Dashboard', null],
         ['admin.posts.index', 'admin.posts.*', 'news', 'News', null],
         ['admin.projects.index', 'admin.projects.*', 'folder', 'Programmes', null],
+        ['admin.resources.index', 'admin.resources.*', 'radio', 'Resources', null],
         ['admin.messages.index', 'admin.messages.*', 'inbox', 'Messages', $unread],
         ['admin.volunteers.index', 'admin.volunteers.*', 'hand', 'Volunteers', $newVol],
         ['admin.subscribers.index', 'admin.subscribers.*', 'users', 'Subscribers', null],

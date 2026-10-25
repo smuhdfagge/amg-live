@@ -7,6 +7,7 @@
         ['route' => 'about', 'label' => 'About us', 'match' => 'about'],
         ['route' => 'work', 'label' => 'Our work', 'match' => 'work*'],
         ['route' => 'projects.index', 'label' => 'Programmes', 'match' => 'projects.*'],
+        ['route' => 'resources.index', 'label' => 'Resources', 'match' => 'resources.*'],
         ['route' => 'news.index', 'label' => 'News', 'match' => 'news.*'],
         ['route' => 'involved', 'label' => 'Get involved', 'match' => 'involved'],
         ['route' => 'contact', 'label' => 'Contact', 'match' => 'contact'],
@@ -156,6 +157,7 @@
             <ul class="footer-links">
                 <li><a href="{{ route('work') }}">Focus areas</a></li>
                 <li><a href="{{ route('projects.index') }}">Programmes</a></li>
+                <li><a href="{{ route('resources.index') }}">Radio, jingles and videos</a></li>
                 <li><a href="{{ route('involved') }}">Volunteer</a></li>
                 <li><a href="{{ route('support') }}">Support our work</a></li>
                 <li><a href="{{ route('contact') }}">Contact us</a></li>

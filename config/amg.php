@@ -47,6 +47,14 @@ return [
         'youtube' => env('AMG_YOUTUBE', ''),
     ],
 
+    // Largest audio and video files the admin can upload, in megabytes.
+    // The server's own PHP limits (upload_max_filesize, post_max_size) must
+    // be at least this big too; the admin form shows the lower of the two.
+    'uploads' => [
+        'audio_mb' => (int) env('AMG_MAX_AUDIO_MB', 50),
+        'video_mb' => (int) env('AMG_MAX_VIDEO_MB', 200),
+    ],
+
     // Bank details for direct gifts. Shown on the Support page only when
     // the account number is filled in.
     'bank' => [
