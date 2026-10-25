@@ -1,0 +1,18 @@
+# cPanel "Git Version Control" deployment
+#
+# To use it:
+#   1. In cPanel > Git Version Control, clone the repository to a folder
+#      outside public_html, for example /home/USERNAME/swatch
+#   2. Copy this file to the project root as .cpanel.yml and change
+#      PUBLIC_HTML below if the site lives in another folder
+#      (an addon domain or subdomain usually has its own folder).
+#   3. Commit and push .cpanel.yml, then click "Update from Remote" and
+#      "Deploy HEAD Commit" in cPanel.
+#
+# The first deploy creates .env and stops. Fill it in from the cPanel
+# File Manager, then click "Deploy HEAD Commit" again.
+---
+deployment:
+  tasks:
+    - export PUBLIC_HTML=$HOME/public_html
+    - cd $HOME/swatch && bash deploy.sh --no-pull --public-html "$PUBLIC_HTML"

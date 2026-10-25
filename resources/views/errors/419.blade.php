@@ -1,0 +1,16 @@
+@extends('layouts.app', ['title' => 'This page has expired', 'hideCta' => true])
+
+@section('content')
+<section class="page-head" style="min-height:52vh;display:flex;align-items:center">
+    <div class="page-head-laurel">@include('partials.laurel')</div>
+    <div class="wrap">
+        <h1>This page has expired</h1>
+        <p class="lead">Go back, refresh the page and send the form again.</p>
+        <div class="btn-row mt-2">
+            <a class="btn btn-indigo" href="{{ route('home') }}">Go to the home page</a>
+            <a class="btn btn-outline" href="{{ route('projects.index') }}">See our programmes</a>
+            <a class="btn btn-outline" href="{{ route('contact') }}">Contact us</a>
+        </div>
+    </div>
+</section>
+@endsection
